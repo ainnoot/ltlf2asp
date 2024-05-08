@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "ltlf2asp"
+version = "0.0.1"
+description = ""
+authors = ["antonio ielo <antonio.ielo@unical.it>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+clingo = "^5.7.1"
+lark-parser = "^0.12.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+ruff = "^0.4.3"
+black = "^24.4.2"
+mypy = "^1.10.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
