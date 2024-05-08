@@ -21,7 +21,7 @@ jobs:
       env: { CONTENT: "${{ toJson(github) }}" }
       run: "echo $CONTENT | jq"
 
-  lint:
+  lint_test_and_build:
     runs-on: ubuntu-latest
 
     steps:
@@ -49,19 +49,11 @@ jobs:
     - name: Typecheck
       run: poetry run mypy ltlf2asp
 
-  build:
-    runs-on: ubuntu-latest
-    needs: lint
-    steps:
-    - uses: actions/checkout@v4
-    - run: pipx install poetry
-    - uses: actions/setup-python@v3
-      with:
-        python-version: "3.12"
-        cache: "poetry"
-
     - name: Install dependencies
       run: poetry install
+
+    - name: Run tests
+      run: poetry run pytest tests/
 
     - name: Build package
       run: poetry build
