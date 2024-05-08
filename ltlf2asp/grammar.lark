@@ -25,9 +25,10 @@ start: ltlf_formula
 ?ltlf_wrapped:     ltlf_atom
              |     LSEPARATOR ltlf_formula RSEPARATOR
 
-symbol: SYMBOL | SQUOTE SYMBOL SQUOTE | DQUOTE SYMBOL DQUOTE
-
 ltlf_atom: symbol
+
+symbol: SYMBOL | SQUOTE FREE_SYMBOL SQUOTE | DQUOTE FREE_SYMBOL DQUOTE
+
 
 UNTIL.2: /U(?=[^a-zA-Z]|$)/
 RELEASE.2: /R(?=[^a-zA-Z]|$)/
@@ -48,6 +49,6 @@ SQUOTE: "'"
 DQUOTE: "\""
 
 // Symbols cannot contain uppercase letters, because these are reserved
-SYMBOL: /[a-zA-Z0-9_\-\_\?]+/
-
+SYMBOL: /[a-zA-Z0-9_\?]+/
+FREE_SYMBOL: /[A-Za-z0-9_\-\?]+/
 %ignore /\s+/
