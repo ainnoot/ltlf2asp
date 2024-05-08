@@ -1,5 +1,3 @@
-from typing import Type
-
 from lark import Lark, Transformer  # type: ignore
 from pathlib import Path
 from ltlf2asp.parser.constants import Constants
@@ -9,10 +7,10 @@ from ltlf2asp.parser.reify_interface import Reify
 
 
 class LTLfFlatTransformer(Transformer):
-    def __init__(self, reification_cls: Type[Reify]):
+    def __init__(self, reification_cls: Reify):
         """Initialize."""
         super().__init__()
-        self.reify: Reify = reification_cls()
+        self.reify: Reify = reification_cls
 
     def start(self, args):
         self.reify.mark_as_root(args[0])
@@ -187,7 +185,7 @@ class LTLfFlatTransformer(Transformer):
         return self.reify.last()
 
 
-def _parse_formula(formula_string: str, start_rule: str, reify: Type[Reify]):
+def _parse_formula(formula_string: str, start_rule: str, reify: Reify):
     GRAMMAR = Path(__file__).parent / "grammar.lark"
     parser = Lark(GRAMMAR.read_text(), parser="lalr", start=start_rule)
     transformer = LTLfFlatTransformer(reify)
@@ -196,4 +194,4 @@ def _parse_formula(formula_string: str, start_rule: str, reify: Type[Reify]):
 
 
 def parse_formula(formula_string: str):
-    return _parse_formula(formula_string, "start", ReifyFormulaAsFacts)
+    return _parse_formula(formula_string, "start", ReifyFormulaAsFacts())
