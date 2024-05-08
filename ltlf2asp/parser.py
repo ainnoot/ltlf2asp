@@ -1,4 +1,4 @@
-from lark import Lark, Transformer
+from lark import Lark, Transformer  # type: ignore
 from pathlib import Path
 import clingo  # type: ignore
 from pysat.formula import IDPool  # type: ignore
