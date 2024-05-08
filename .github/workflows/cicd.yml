@@ -41,13 +41,13 @@ jobs:
       run: poetry install --only=dev
 
     - name: Black linting
-      run: poetry run black --check declasp
+      run: poetry run black --check ltlf2asp
 
     - name: Ruff linting
-      run: poetry run ruff check declasp
+      run: poetry run ruff check ltlf2asp
 
     - name: Typecheck
-      run: poetry run mypy declasp
+      run: poetry run mypy ltlf2asp
 
   build:
     runs-on: ubuntu-latest
