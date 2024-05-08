@@ -25,25 +25,18 @@ start: ltlf_formula
 ?ltlf_wrapped:     ltlf_atom
              |     LSEPARATOR ltlf_formula RSEPARATOR
 
-ltlf_true: TRUE
-ltlf_false: FALSE
-ltlf_last: LAST
-symbol: SYMBOL | QUOTE SYMBOL QUOTE
+symbol: SYMBOL | SQUOTE SYMBOL SQUOTE | DQUOTE SYMBOL DQUOTE
 
-ltlf_atom: ltlf_true | ltlf_false | ltlf_last | symbol
+ltlf_atom: symbol
 
-
-UNTIL: "U"
-WEAK_UNTIL: "W"
-RELEASE: "R"
-STRONG_RELEASE: "M"
-ALWAYS: "G"
-EVENTUALLY: "F"
-NEXT: "X"
-WEAK_NEXT: "WX"
-LAST: "Last" | "End" | "last" | "end" | "END" | "LAST"
-TRUE: "True" | "true" | "TRUE"
-FALSE: "False" | "false" | "FALSE"
+UNTIL.2: /U(?=[^a-zA-Z]|$)/
+RELEASE.2: /R(?=[^a-zA-Z]|$)/
+ALWAYS.2: /G(?=[^a-zA-Z]|$)/
+EVENTUALLY.2: /F(?=[^a-zA-Z]|$)/
+NEXT.2: /X(?=[^a-zA-Z]|$)/
+WEAK_NEXT.2: /WX(?=[^a-zA-Z]|$)/
+WEAK_UNTIL.2: /W(?=[^a-zA-Z]|$)/
+STRONG_RELEASE.2: /M(?=[^a-zA-Z]|$)/
 NOT: "!" | "~"
 OR: "|" | "||"
 AND: "&" | "&&"
@@ -51,9 +44,10 @@ EQUIVALENCE: "=" | "<->" | "<=>"
 IMPLY: "->" | "=>"
 LSEPARATOR: "("
 RSEPARATOR: ")"
-QUOTE: "\""
+SQUOTE: "'"
+DQUOTE: "\""
 
 // Symbols cannot contain uppercase letters, because these are reserved
-SYMBOL: /[a-zA-Z]+[a-zA-Z0-9\-\_\?]*/
+SYMBOL: /[a-zA-Z0-9_\-\_\?]+/
 
 %ignore /\s+/

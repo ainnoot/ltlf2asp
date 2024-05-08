@@ -257,9 +257,8 @@ class LTLfFlatTransformer(Transformer):
         return args[1]
 
     def symbol(self, args):
-        if len(args) == 1:
-            return args[0].value
-        return '"' + args[1].value + '"'
+        string = "".join(x.value for x in args)
+        return string.replace("\'", "\"")
 
     def ltlf_atom(self, args):
         if isinstance(args[0], int):
@@ -305,3 +304,14 @@ def parse_formula(formula_string: str, start_rule: str = "start"):
     transformer = LTLfFlatTransformer()
     tree = parser.parse(formula_string)
     return transformer.transform(tree)
+
+
+if __name__ == '__main__':
+    while True:
+        GRAMMAR = Path(__file__).parent / "grammar.lark"
+        parser = Lark(GRAMMAR.read_text(), parser="lalr", start="start")
+        formula_string = input("> ")
+        tree = parser.parse(formula_string)
+        trans = LTLfFlatTransformer()
+        atoms = trans.transform(tree)
+        print([str(x) for x in atoms])
