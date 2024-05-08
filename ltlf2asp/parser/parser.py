@@ -4,7 +4,6 @@ from lark import Lark, Transformer  # type: ignore
 from pathlib import Path
 from ltlf2asp.parser.constants import Constants
 from ltlf2asp.parser.reify_as_atoms import ReifyFormulaAsFacts
-from ltlf2asp.parser.reify_as_object import ReifyFormulaAsObject
 from ltlf2asp.exceptions import ParsingError, UnsupportedOperator
 from ltlf2asp.parser.reify_interface import Reify
 
@@ -188,14 +187,13 @@ class LTLfFlatTransformer(Transformer):
         return self.reify.last()
 
 
-def _parse_formula(
-    formula_string: str, start_rule: str, reify: Type[Reify]
-):
+def _parse_formula(formula_string: str, start_rule: str, reify: Type[Reify]):
     GRAMMAR = Path(__file__).parent / "grammar.lark"
     parser = Lark(GRAMMAR.read_text(), parser="lalr", start=start_rule)
     transformer = LTLfFlatTransformer(reify)
     tree = parser.parse(formula_string)
     return transformer.transform(tree)
+
 
 def parse_formula(formula_string: str):
     return _parse_formula(formula_string, "start", ReifyFormulaAsFacts)
