@@ -1,19 +1,20 @@
 from lark import Lark, Transformer  # type: ignore
 from pathlib import Path
-from ltlf2asp.constants import Constants
-from ltlf2asp.reify import ReifyFormula
+from ltlf2asp.parser.constants import Constants
+from ltlf2asp.parser.reify_as_atoms import ReifyFormulaAsFacts
+from ltlf2asp.parser.reify_as_object import ReifyFormulaAsObject
 from ltlf2asp.exceptions import ParsingError, UnsupportedOperator
 
 
 class LTLfFlatTransformer(Transformer):
-    def __init__(self):
+    def __init__(self, reification_cls):
         """Initialize."""
         super().__init__()
-        self.reify = ReifyFormula()
+        self.reify = reification_cls()
 
     def start(self, args):
-        self.reify.root(args[0])
-        return self.reify.facts
+        self.reify.mark_as_root(args[0])
+        return self.reify.result()
 
     def ltlf_formula(self, args):
         return args[0]
@@ -170,7 +171,7 @@ class LTLfFlatTransformer(Transformer):
             elif args[0].lower() in (Constants.LAST, Constants.END):
                 return self.ltlf_last(args)
 
-            return self.reify.atomic_formula(args[0])
+            return self.reify.proposition(args[0])
 
         raise ParsingError
 
@@ -184,9 +185,18 @@ class LTLfFlatTransformer(Transformer):
         return self.reify.last()
 
 
-def parse_formula(formula_string: str, start_rule: str = "start"):
+def parse_formula(
+    formula_string: str, start_rule: str = "start", reify=ReifyFormulaAsFacts
+):
     GRAMMAR = Path(__file__).parent / "grammar.lark"
     parser = Lark(GRAMMAR.read_text(), parser="lalr", start=start_rule)
-    transformer = LTLfFlatTransformer()
+    transformer = LTLfFlatTransformer(reify)
     tree = parser.parse(formula_string)
     return transformer.transform(tree)
+
+
+if __name__ == "__main__":
+    while True:
+        formula_string = input("> ")
+        ans = parse_formula(formula_string, "start", ReifyFormulaAsObject)
+        print(ans)

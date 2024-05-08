@@ -2,19 +2,23 @@ from typing import Set, Iterable
 
 import clingo  # type: ignore
 from pysat.formula import IDPool  # type: ignore
-from ltlf2asp.constants import Constants
+from ltlf2asp.parser.constants import Constants
+from ltlf2asp.parser.reify_interface import Reify
 
 
 def clingo_symbol(name, args):
     return clingo.Function(name, [clingo.Number(x) for x in args])
 
 
-class ReifyFormula:
+class ReifyFormulaAsFacts(Reify[int, Set[clingo.Symbol]]):
     def __init__(self):
         self.pool = IDPool()
-        self.facts: Set[clingo.Function] = set()
+        self.facts: Set[clingo.Symbol] = set()
 
-    def reify_constant(self, name: str):
+    def result(self) -> Set[clingo.Symbol]:
+        return self.facts
+
+    def constant(self, name: str):
         id = self.pool.id((name,))
         self.facts.add(clingo_symbol(name, [id]))
         return id
@@ -36,15 +40,15 @@ class ReifyFormula:
         return id
 
     def true(self) -> int:
-        return self.reify_constant(Constants.TRUE)
+        return self.constant(Constants.TRUE)
 
     def false(self) -> int:
-        return self.reify_constant(Constants.FALSE)
+        return self.constant(Constants.FALSE)
 
     def last(self) -> int:
-        return self.reify_constant(Constants.LAST)
+        return self.constant(Constants.LAST)
 
-    def atomic_formula(self, string: str) -> int:
+    def proposition(self, string: str) -> int:
         id = self.pool.id((Constants.ATOMIC, string))
         self.facts.add(
             clingo.Function(
@@ -92,6 +96,5 @@ class ReifyFormula:
     def disjunction(self, fs) -> int:
         return self.reify_variadic(fs, Constants.DISJUNCTION)
 
-    def root(self, f) -> int:
+    def mark_as_root(self, f) -> None:
         self.facts.add(clingo_symbol(Constants.ROOT, [f]))
-        return f
