@@ -22,6 +22,8 @@ class OperatorId(IntEnum):
     EQUALS = 9
     UNTIL = 10
     RELEASE = 11
+    STRONG_RELEASE = 12
+    WEAK_UNTIL = 13
 
 
 class LTLfFlatTransformer(Transformer):
@@ -128,6 +130,25 @@ class LTLfFlatTransformer(Transformer):
 
         raise ParsingError
 
+    def ltlf_weak_until(self, args):
+        if len(args) == 1:
+            return args[0]
+
+        if (len(args) - 1) % 2 == 0:
+            subformulas = args[::2]
+            assert len(subformulas) == 2, "Variadic WeakUntil not supported!"
+            lhs, rhs = subformulas
+            id = self.pool.id((OperatorId.WEAK_UNTIL, lhs, rhs))
+            self.reification.add(
+                clingo.Function(
+                    "weak_until",
+                    [clingo.Number(id), clingo.Number(lhs), clingo.Number(rhs)],
+                )
+            )
+            return id
+
+        raise ParsingError
+
     def ltlf_release(self, args):
         if len(args) == 1:
             return args[0]
@@ -140,6 +161,25 @@ class LTLfFlatTransformer(Transformer):
             self.reification.add(
                 clingo.Function(
                     "release",
+                    [clingo.Number(id), clingo.Number(lhs), clingo.Number(rhs)],
+                )
+            )
+            return id
+
+        raise ParsingError
+
+    def ltlf_strong_release(self, args):
+        if len(args) == 1:
+            return args[0]
+
+        if (len(args) - 1) % 2 == 0:
+            subformulas = args[::2]
+            assert len(subformulas) == 2, "Variadic StrongRelease not supported!"
+            lhs, rhs = subformulas
+            id = self.pool.id((OperatorId.RELEASE, lhs, rhs))
+            self.reification.add(
+                clingo.Function(
+                    "strong_release",
                     [clingo.Number(id), clingo.Number(lhs), clingo.Number(rhs)],
                 )
             )

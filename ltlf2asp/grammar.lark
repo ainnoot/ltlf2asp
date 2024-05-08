@@ -1,12 +1,14 @@
 start: ltlf_formula
 
-?ltlf_formula:     ltlf_equivalence
-?ltlf_equivalence: ltlf_implication (EQUIVALENCE ltlf_implication)*
-?ltlf_implication: ltlf_or (IMPLY ltlf_or)*
-?ltlf_or:          ltlf_and (OR ltlf_and)*
-?ltlf_and:         ltlf_until (AND ltlf_until)*
-?ltlf_until:       ltlf_release (UNTIL ltlf_release)*
-?ltlf_release:     ltlf_unaryop (RELEASE ltlf_unaryop)*
+?ltlf_formula:            ltlf_equivalence
+?ltlf_equivalence:        ltlf_implication (EQUIVALENCE ltlf_implication)*
+?ltlf_implication:        ltlf_or (IMPLY ltlf_or)*
+?ltlf_or:                 ltlf_and (OR ltlf_and)*
+?ltlf_and:                ltlf_until (AND ltlf_until)*
+?ltlf_until:              ltlf_weak_until (UNTIL ltlf_weak_until)*
+?ltlf_weak_until:         ltlf_release (WEAK_UNTIL ltlf_release)*
+?ltlf_release:            ltlf_strong_release (RELEASE ltlf_strong_release)*
+?ltlf_strong_release:     ltlf_unaryop (STRONG_RELEASE ltlf_unaryop)*
 
 ?ltlf_unaryop:     ltlf_always
              |     ltlf_eventually
@@ -47,9 +49,10 @@ clingo_term:  integer
 integer: /[1-9]+[0-9]*/ | /0/
 string: "\"" /[a-zA-Z0-9]+/ "\""
 
-// Operators must not be part of a word
 UNTIL: "U"
+WEAK_UNTIL: "W"
 RELEASE: "R"
+STRONG_RELEASE: "M"
 ALWAYS: "G"
 EVENTUALLY: "F"
 NEXT: "X"
