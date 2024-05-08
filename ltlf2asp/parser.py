@@ -1,32 +1,19 @@
 from lark import Lark, Transformer  # type: ignore
 from pathlib import Path
-import clingo  # type: ignore
-from pysat.formula import IDPool  # type: ignore
 from ltlf2asp.constants import Constants
-
-
-class ParsingError(Exception):
-    pass
-
-
-class UnsupportedOperator(Exception):
-    def __init__(self, string):
-        self.string = string
-
-    def message(self):
-        return self.string
+from ltlf2asp.reify import ReifyFormula
+from ltlf2asp.exceptions import ParsingError, UnsupportedOperator
 
 
 class LTLfFlatTransformer(Transformer):
     def __init__(self):
         """Initialize."""
         super().__init__()
-        self.pool = IDPool()
-        self.reification = set()
+        self.reify = ReifyFormula()
 
     def start(self, args):
-        self.reification.add(clingo.Function(Constants.ROOT, [clingo.Number(args[0])]))
-        return self.reification
+        self.reify.root(args[0])
+        return self.reify.facts
 
     def ltlf_formula(self, args):
         return args[0]
@@ -39,15 +26,9 @@ class LTLfFlatTransformer(Transformer):
             subformulas = args[::2]
             if len(subformulas) != 2:
                 raise UnsupportedOperator("Variadic Release is not supported!")
+
             lhs, rhs = subformulas
-            id = self.pool.id((Constants.EQUALS, lhs, rhs))
-            self.reification.add(
-                clingo.Function(
-                    Constants.EQUALS,
-                    [clingo.Number(id), clingo.Number(lhs), clingo.Number(rhs)],
-                )
-            )
-            return id
+            return self.reify.equivalence(lhs, rhs)
 
         raise ParsingError
 
@@ -60,14 +41,7 @@ class LTLfFlatTransformer(Transformer):
             if len(subformulas) != 2:
                 raise UnsupportedOperator("Variadic Implication is not supported!")
             lhs, rhs = subformulas
-            id = self.pool.id((Constants.IMPLIES, lhs, rhs))
-            self.reification.add(
-                clingo.Function(
-                    Constants.IMPLIES,
-                    [clingo.Number(id), clingo.Number(lhs), clingo.Number(rhs)],
-                )
-            )
-            return id
+            return self.reify.implies(lhs, rhs)
 
         raise ParsingError
 
@@ -77,14 +51,7 @@ class LTLfFlatTransformer(Transformer):
 
         if (len(args) - 1) % 2 == 0:
             subformulas = args[::2]
-            id = self.pool.id((Constants.DISJUNCTION, *subformulas))
-            for x in subformulas:
-                self.reification.add(
-                    clingo.Function(
-                        Constants.DISJUNCTION, [clingo.Number(id), clingo.Number(x)]
-                    )
-                )
-            return id
+            return self.reify.disjunction(subformulas)
 
         raise ParsingError
 
@@ -94,14 +61,7 @@ class LTLfFlatTransformer(Transformer):
 
         if (len(args) - 1) % 2 == 0:
             subformulas = args[::2]
-            id = self.pool.id((Constants.CONJUNCTION, *subformulas))
-            for x in subformulas:
-                self.reification.add(
-                    clingo.Function(
-                        Constants.CONJUNCTION, [clingo.Number(id), clingo.Number(x)]
-                    )
-                )
-            return id
+            return self.reify.conjunction(subformulas)
 
         raise ParsingError
 
@@ -114,14 +74,7 @@ class LTLfFlatTransformer(Transformer):
             if len(subformulas) != 2:
                 raise UnsupportedOperator("Variadic Until is not supported!")
             lhs, rhs = subformulas
-            id = self.pool.id((Constants.UNTIL, lhs, rhs))
-            self.reification.add(
-                clingo.Function(
-                    Constants.UNTIL,
-                    [clingo.Number(id), clingo.Number(lhs), clingo.Number(rhs)],
-                )
-            )
-            return id
+            return self.reify.until(lhs, rhs)
 
         raise ParsingError
 
@@ -134,14 +87,7 @@ class LTLfFlatTransformer(Transformer):
             if len(subformulas) != 2:
                 raise UnsupportedOperator("Variadic WeakUntil is not supported!")
             lhs, rhs = subformulas
-            id = self.pool.id((Constants.WEAK_UNTIL, lhs, rhs))
-            self.reification.add(
-                clingo.Function(
-                    Constants.WEAK_UNTIL,
-                    [clingo.Number(id), clingo.Number(lhs), clingo.Number(rhs)],
-                )
-            )
-            return id
+            return self.reify.weak_until(lhs, rhs)
 
         raise ParsingError
 
@@ -154,14 +100,7 @@ class LTLfFlatTransformer(Transformer):
             if len(subformulas) != 2:
                 raise UnsupportedOperator("Variadic Release is not supported!")
             lhs, rhs = subformulas
-            id = self.pool.id((Constants.RELEASE, lhs, rhs))
-            self.reification.add(
-                clingo.Function(
-                    Constants.RELEASE,
-                    [clingo.Number(id), clingo.Number(lhs), clingo.Number(rhs)],
-                )
-            )
-            return id
+            return self.reify.release(lhs, rhs)
 
         raise ParsingError
 
@@ -174,14 +113,7 @@ class LTLfFlatTransformer(Transformer):
             if len(subformulas) != 2:
                 raise UnsupportedOperator("Variadic StrongRelease is not supported!")
             lhs, rhs = subformulas
-            id = self.pool.id((Constants.RELEASE, lhs, rhs))
-            self.reification.add(
-                clingo.Function(
-                    Constants.STRONG_RELEASE,
-                    [clingo.Number(id), clingo.Number(lhs), clingo.Number(rhs)],
-                )
-            )
-            return id
+            return self.reify.strong_release(lhs, rhs)
 
         raise ParsingError
 
@@ -189,59 +121,31 @@ class LTLfFlatTransformer(Transformer):
         if len(args) == 1:
             return args[0]
 
-        id = self.pool.id((Constants.ALWAYS, args[1]))
-        self.reification.add(
-            clingo.Function(
-                Constants.ALWAYS, [clingo.Number(id), clingo.Number(args[1])]
-            )
-        )
-        return id
+        return self.reify.always(args[1])
 
     def ltlf_eventually(self, args):
         if len(args) == 1:
             return args[0]
 
-        id = self.pool.id((Constants.EVENTUALLY, args[1]))
-        self.reification.add(
-            clingo.Function(
-                Constants.EVENTUALLY, [clingo.Number(id), clingo.Number(args[1])]
-            )
-        )
-        return id
+        return self.reify.eventually(args[1])
 
     def ltlf_next(self, args):
         if len(args) == 1:
             return args[0]
 
-        id = self.pool.id((Constants.NEXT, args[1]))
-        self.reification.add(
-            clingo.Function(Constants.NEXT, [clingo.Number(id), clingo.Number(args[1])])
-        )
-        return id
+        return self.reify.next(args[1])
 
     def ltlf_weak_next(self, args):
         if len(args) == 1:
             return args[0]
 
-        id = self.pool.id((Constants.WEAK_NEXT, args[1]))
-        self.reification.add(
-            clingo.Function(
-                Constants.WEAK_NEXT, [clingo.Number(id), clingo.Number(args[1])]
-            )
-        )
-        return id
+        return self.reify.weak_next(args[1])
 
     def ltlf_not(self, args):
         if len(args) == 1:
             return args[0]
 
-        id = self.pool.id((Constants.NEGATE, args[1]))
-        self.reification.add(
-            clingo.Function(
-                Constants.NEGATE, [clingo.Number(id), clingo.Number(args[1])]
-            )
-        )
-        return id
+        return self.reify.negate(args[1])
 
     def ltlf_wrapped(self, args):
         if len(args) == 1:
@@ -260,36 +164,24 @@ class LTLfFlatTransformer(Transformer):
             if args[0].lower() == Constants.TRUE:
                 return self.ltlf_true(args)
 
-            if args[0].lower() == Constants.FALSE:
+            elif args[0].lower() == Constants.FALSE:
                 return self.ltlf_false(args)
 
-            if args[0].lower() in (Constants.LAST, Constants.END):
+            elif args[0].lower() in (Constants.LAST, Constants.END):
                 return self.ltlf_last(args)
 
-            id = self.pool.id((Constants.ATOMIC, args[0]))
-            self.reification.add(
-                clingo.Function(
-                    Constants.ATOMIC, [clingo.Number(id), clingo.String(args[0])]
-                )
-            )
-            return id
+            return self.reify.atomic_formula(args[0])
 
         raise ParsingError
 
     def ltlf_true(self, _args):
-        id = self.pool.id(Constants.TRUE)
-        self.reification.add(clingo.Function(Constants.TRUE, [clingo.Number(id)]))
-        return id
+        return self.reify.true()
 
     def ltlf_false(self, _args):
-        id = self.pool.id(Constants.FALSE)
-        self.reification.add(clingo.Function(Constants.FALSE, [clingo.Number(id)]))
-        return id
+        return self.reify.false()
 
     def ltlf_last(self, _args):
-        id = self.pool.id(Constants.LAST)
-        self.reification.add(clingo.Function(Constants.LAST, [clingo.Number(id)]))
-        return id
+        return self.reify.last()
 
 
 def parse_formula(formula_string: str, start_rule: str = "start"):
@@ -298,14 +190,3 @@ def parse_formula(formula_string: str, start_rule: str = "start"):
     transformer = LTLfFlatTransformer()
     tree = parser.parse(formula_string)
     return transformer.transform(tree)
-
-
-if __name__ == "__main__":
-    while True:
-        GRAMMAR = Path(__file__).parent / "grammar.lark"
-        parser = Lark(GRAMMAR.read_text(), parser="lalr", start="start")
-        formula_string = input("> ")
-        tree = parser.parse(formula_string)
-        trans = LTLfFlatTransformer()
-        atoms = trans.transform(tree)
-        print([str(x) for x in atoms])
