@@ -1,9 +1,15 @@
-from ltlf2asp.parser import parse_formula
+import clingo
+
+from ltlf2asp.parser.reify_as_atoms import InjectIntoBackend
+from ltlf2asp.parser.parser import _parse_formula
 import sys
-from pathlib import Path
 
 contents = sys.argv[1]
 
-ans = parse_formula(contents)
+ctl = clingo.Control()
+with ctl.backend() as backend:
+    _parse_formula(contents, "start", InjectIntoBackend(backend))
+ctl.ground([("base", [])])
 
-print(" ".join(str(x) for x in ans))
+for x in ctl.symbolic_atoms:
+    print(str(x.symbol))
