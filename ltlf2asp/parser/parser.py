@@ -1,16 +1,19 @@
+from typing import Type
+
 from lark import Lark, Transformer  # type: ignore
 from pathlib import Path
 from ltlf2asp.parser.constants import Constants
 from ltlf2asp.parser.reify_as_atoms import ReifyFormulaAsFacts
 from ltlf2asp.parser.reify_as_object import ReifyFormulaAsObject
 from ltlf2asp.exceptions import ParsingError, UnsupportedOperator
+from ltlf2asp.parser.reify_interface import Reify
 
 
 class LTLfFlatTransformer(Transformer):
-    def __init__(self, reification_cls):
+    def __init__(self, reification_cls: Type[Reify]):
         """Initialize."""
         super().__init__()
-        self.reify = reification_cls()
+        self.reify: Reify = reification_cls()
 
     def start(self, args):
         self.reify.mark_as_root(args[0])
@@ -185,8 +188,8 @@ class LTLfFlatTransformer(Transformer):
         return self.reify.last()
 
 
-def parse_formula(
-    formula_string: str, start_rule: str = "start", reify=ReifyFormulaAsFacts
+def _parse_formula(
+    formula_string: str, start_rule: str, reify: Type[Reify]
 ):
     GRAMMAR = Path(__file__).parent / "grammar.lark"
     parser = Lark(GRAMMAR.read_text(), parser="lalr", start=start_rule)
@@ -194,9 +197,5 @@ def parse_formula(
     tree = parser.parse(formula_string)
     return transformer.transform(tree)
 
-
-if __name__ == "__main__":
-    while True:
-        formula_string = input("> ")
-        ans = parse_formula(formula_string, "start", ReifyFormulaAsObject)
-        print(ans)
+def parse_formula(formula_string: str):
+    return _parse_formula(formula_string, "start", ReifyFormulaAsFacts)
