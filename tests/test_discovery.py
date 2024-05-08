@@ -1,2 +1,2 @@
 def test_discovery():
-	assert True
+    assert True
