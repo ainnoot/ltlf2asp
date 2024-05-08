@@ -28,21 +28,21 @@ class TestAtomicTokens:
     def test_uppercase_symbol(self, token):
         dag = parse_formula(token)
         assert len(dag) == 2
-        assert clingo.Function('atomic', [clingo.Number(1), clingo.parse_term('uppercase_symbol("{}")'.format(token))]) in dag
+        assert clingo.Function('atomic', [clingo.Number(1), clingo.String(token)]) in dag
         assert clingo.Function('root', [clingo.Number(1)]) in dag
 
     @pytest.mark.parametrize('token', ('"Abc"', '"Ab2"', '"A23_xyzXW"'))
     def test_quoted_symbol(self, token):
         dag = parse_formula(token)
         assert len(dag) == 2
-        assert clingo.Function('atomic', [clingo.Number(1), clingo.parse_term('quote("{}")'.format(token[1:-1]))]) in dag
+        assert clingo.Function('atomic', [clingo.Number(1), clingo.String(token)]) in dag
         assert clingo.Function('root', [clingo.Number(1)]) in dag
 
     @pytest.mark.parametrize('token', ('abc', 'ab2', 'a23_xyzXW'))
     def test_clingo_symbol(self, token):
         dag = parse_formula(token)
         assert len(dag) == 2
-        assert clingo.Function('atomic', [clingo.Number(1), clingo.parse_term(token)]) in dag
+        assert clingo.Function('atomic', [clingo.Number(1), clingo.String(token)]) in dag
         assert clingo.Function('root', [clingo.Number(1)]) in dag
 
 class TestUnaryTokens:
