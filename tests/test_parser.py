@@ -59,3 +59,27 @@ class TestUnaryTokens:
         assert len(dag) == 3
         assert clingo.Function('weak_next', [clingo.Number(2), clingo.Number(1)]) in dag
         assert clingo.Function('root', [clingo.Number(2)]) in dag
+
+    def test_until(self):
+        dag = parse_formula(f'a U b')
+        assert len(dag) == 4
+        assert clingo.Function('until', [clingo.Number(3), clingo.Number(1), clingo.Number(2)]) in dag
+        assert clingo.Function('root', [clingo.Number(3)]) in dag
+
+    def test_weak_until(self):
+        dag = parse_formula(f'a W b')
+        assert len(dag) == 4
+        assert clingo.Function('weak_until', [clingo.Number(3), clingo.Number(1), clingo.Number(2)]) in dag
+        assert clingo.Function('root', [clingo.Number(3)]) in dag
+
+    def test_release(self):
+        dag = parse_formula(f'a R b')
+        assert len(dag) == 4
+        assert clingo.Function('release', [clingo.Number(3), clingo.Number(1), clingo.Number(2)]) in dag
+        assert clingo.Function('root', [clingo.Number(3)]) in dag
+
+    def test_strong_release(self):
+        dag = parse_formula(f'a M b')
+        assert len(dag) == 4
+        assert clingo.Function('strong_release', [clingo.Number(3), clingo.Number(1), clingo.Number(2)]) in dag
+        assert clingo.Function('root', [clingo.Number(3)]) in dag
