@@ -1,7 +1,7 @@
 from lark import Lark, Transformer
 from pathlib import Path
 import clingo
-from pysat.formula import IDPool # type: ignore
+from pysat.formula import IDPool  # type: ignore
 from enum import IntEnum
 
 
