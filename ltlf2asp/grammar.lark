@@ -25,41 +25,19 @@ start: ltlf_formula
 ?ltlf_wrapped:     ltlf_atom
              |     LSEPARATOR ltlf_formula RSEPARATOR
 
-ltlf_true: TRUE
-ltlf_false: FALSE
-ltlf_last: LAST
+ltlf_atom: symbol
 
-ltlf_atom:         clingo_symbol
-          |        uppercase_symbol
-          |        quoted_symbol
-          |        ltlf_true
-          |        ltlf_false
-          |        ltlf_last
+symbol: SYMBOL | SQUOTE FREE_SYMBOL SQUOTE | DQUOTE FREE_SYMBOL DQUOTE
 
 
-
-uppercase_symbol: /[A-Z]+[A-Za-z_0-9]*/
-quoted_symbol: "\"" /[a-z0-9A-Z_]+/"\""
-
-clingo_symbol: PREDICATE_NAME (LSEPARATOR clingo_term ("," clingo_term)* RSEPARATOR)?
-clingo_term:  integer
-           |  string
-           |  clingo_symbol
-
-integer: /[1-9]+[0-9]*/ | /0/
-string: "\"" /[a-zA-Z0-9]+/ "\""
-
-UNTIL: "U"
-WEAK_UNTIL: "W"
-RELEASE: "R"
-STRONG_RELEASE: "M"
-ALWAYS: "G"
-EVENTUALLY: "F"
-NEXT: "X"
-WEAK_NEXT: "WX"
-LAST: "Last" | "End" | "last" | "end" | "END"
-TRUE: "True" | "true" | "TRUE"
-FALSE: "False" | "false" | "FALSE"
+UNTIL.2: /U(?=[^a-zA-Z]|$)/
+RELEASE.2: /R(?=[^a-zA-Z]|$)/
+ALWAYS.2: /G(?=[^a-zA-Z]|$)/
+EVENTUALLY.2: /F(?=[^a-zA-Z]|$)/
+NEXT.2: /X(?=[^a-zA-Z]|$)/
+WEAK_NEXT.2: /WX(?=[^a-zA-Z]|$)/
+WEAK_UNTIL.2: /W(?=[^a-zA-Z]|$)/
+STRONG_RELEASE.2: /M(?=[^a-zA-Z]|$)/
 NOT: "!" | "~"
 OR: "|" | "||"
 AND: "&" | "&&"
@@ -67,8 +45,10 @@ EQUIVALENCE: "=" | "<->" | "<=>"
 IMPLY: "->" | "=>"
 LSEPARATOR: "("
 RSEPARATOR: ")"
+SQUOTE: "'"
+DQUOTE: "\""
 
 // Symbols cannot contain uppercase letters, because these are reserved
-PREDICATE_NAME: /[a-z][a-z0-9_A-Z]*/
-
+SYMBOL: /[a-zA-Z0-9_\?]+/
+FREE_SYMBOL: /[A-Za-z0-9_\-\?]+/
 %ignore /\s+/

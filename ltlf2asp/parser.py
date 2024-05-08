@@ -9,6 +9,14 @@ class ParsingError(Exception):
     pass
 
 
+class UnsupportedOperator(Exception):
+    def __init__(self, string):
+        self.string = string
+
+    def message(self):
+        return self.string
+
+
 class OperatorId(IntEnum):
     ATOMIC = 0
     NEXT = 1
@@ -46,7 +54,8 @@ class LTLfFlatTransformer(Transformer):
 
         if (len(args) - 1) % 2 == 0:
             subformulas = args[::2]
-            assert len(subformulas) == 2, "Variadic Release not supported!"
+            if len(subformulas) != 2:
+                raise UnsupportedOperator("Variadic Release is not supported!")
             lhs, rhs = subformulas
             id = self.pool.id((OperatorId.EQUALS, lhs, rhs))
             self.reification.add(
@@ -65,7 +74,8 @@ class LTLfFlatTransformer(Transformer):
 
         if (len(args) - 1) % 2 == 0:
             subformulas = args[::2]
-            assert len(subformulas) == 2, "Variadic Implies not supported!"
+            if len(subformulas) != 2:
+                raise UnsupportedOperator("Variadic Implication is not supported!")
             lhs, rhs = subformulas
             id = self.pool.id((OperatorId.IMPLIES, lhs, rhs))
             self.reification.add(
@@ -118,7 +128,8 @@ class LTLfFlatTransformer(Transformer):
 
         if (len(args) - 1) % 2 == 0:
             subformulas = args[::2]
-            assert len(subformulas) == 2, "Variadic Release not supported!"
+            if len(subformulas) != 2:
+                raise UnsupportedOperator("Variadic Until is not supported!")
             lhs, rhs = subformulas
             id = self.pool.id((OperatorId.UNTIL, lhs, rhs))
             self.reification.add(
@@ -136,7 +147,8 @@ class LTLfFlatTransformer(Transformer):
 
         if (len(args) - 1) % 2 == 0:
             subformulas = args[::2]
-            assert len(subformulas) == 2, "Variadic WeakUntil not supported!"
+            if len(subformulas) != 2:
+                raise UnsupportedOperator("Variadic WeakUntil is not supported!")
             lhs, rhs = subformulas
             id = self.pool.id((OperatorId.WEAK_UNTIL, lhs, rhs))
             self.reification.add(
@@ -155,7 +167,8 @@ class LTLfFlatTransformer(Transformer):
 
         if (len(args) - 1) % 2 == 0:
             subformulas = args[::2]
-            assert len(subformulas) == 2, "Variadic Release not supported!"
+            if len(subformulas) != 2:
+                raise UnsupportedOperator("Variadic Release is not supported!")
             lhs, rhs = subformulas
             id = self.pool.id((OperatorId.RELEASE, lhs, rhs))
             self.reification.add(
@@ -174,7 +187,8 @@ class LTLfFlatTransformer(Transformer):
 
         if (len(args) - 1) % 2 == 0:
             subformulas = args[::2]
-            assert len(subformulas) == 2, "Variadic StrongRelease not supported!"
+            if len(subformulas) != 2:
+                raise UnsupportedOperator("Variadic StrongRelease is not supported!")
             lhs, rhs = subformulas
             id = self.pool.id((OperatorId.RELEASE, lhs, rhs))
             self.reification.add(
@@ -242,14 +256,27 @@ class LTLfFlatTransformer(Transformer):
             return args[0]
         return args[1]
 
+    def symbol(self, args):
+        string = "".join(x.value for x in args)
+        return string.replace("'", '"')
+
     def ltlf_atom(self, args):
         if isinstance(args[0], int):
             return args[0]
 
-        elif type(args[0]) == clingo.Symbol:
+        if isinstance(args[0], str):
+            if args[0].lower() == "true":
+                return self.ltlf_true(args)
+
+            if args[0].lower() == "false":
+                return self.ltlf_false(args)
+
+            if args[0].lower() in ("last", "end"):
+                return self.ltlf_last(args)
+
             id = self.pool.id((OperatorId.ATOMIC, args[0]))
             self.reification.add(
-                clingo.Function("atomic", [clingo.Number(id), args[0]])
+                clingo.Function("atomic", [clingo.Number(id), clingo.String(args[0])])
             )
             return id
 
@@ -270,56 +297,6 @@ class LTLfFlatTransformer(Transformer):
         self.reification.add(clingo.Function("last", [clingo.Number(id)]))
         return id
 
-    def quoted_symbol(self, args):
-        print("Got quoted symbols:", args)
-        return clingo.Function("quote", [clingo.String(args[0].value)])
-
-    def clingo_symbol(self, args):
-        if len(args) == 1:
-            # TODO: Fix the grammar...
-            if args[0].value in (
-                "Last",
-                "last",
-                "True",
-                "true",
-                "False",
-                "false",
-                "TRUE",
-                "FALSE",
-                "LAST",
-                "end",
-                "END",
-                "End",
-            ):
-                return self.uppercase_symbol(args)
-
-            atom = clingo.Function(args[0].value)
-            return atom
-
-        atom = clingo.Function(
-            args[0].value, [x for x in args[1:-1] if isinstance(x, clingo.Symbol)]
-        )
-        return atom
-
-    def uppercase_symbol(self, args):
-        if args[0].value in ("True", "true", "TRUE"):
-            return self.ltlf_true(args)
-        elif args[0].value in ("False", "false", "FALSE"):
-            return self.ltlf_false(args)
-        elif args[0].value in ("Last", "last", "End", "end", "LAST", "END"):
-            return self.ltlf_last(args)
-
-        return clingo.Function("uppercase_symbol", [clingo.String(args[0].value)])
-
-    def clingo_term(self, args):
-        return args[0]
-
-    def integer(self, args):
-        return clingo.Number(int(args[0].value))
-
-    def string(self, args):
-        return clingo.String(args[0].value)
-
 
 def parse_formula(formula_string: str, start_rule: str = "start"):
     GRAMMAR = Path(__file__).parent / "grammar.lark"
@@ -327,3 +304,14 @@ def parse_formula(formula_string: str, start_rule: str = "start"):
     transformer = LTLfFlatTransformer()
     tree = parser.parse(formula_string)
     return transformer.transform(tree)
+
+
+if __name__ == "__main__":
+    while True:
+        GRAMMAR = Path(__file__).parent / "grammar.lark"
+        parser = Lark(GRAMMAR.read_text(), parser="lalr", start="start")
+        formula_string = input("> ")
+        tree = parser.parse(formula_string)
+        trans = LTLfFlatTransformer()
+        atoms = trans.transform(tree)
+        print([str(x) for x in atoms])
