@@ -9,6 +9,14 @@ class ParsingError(Exception):
     pass
 
 
+class UnsupportedOperator(Exception):
+    def __init__(self, string):
+        self.string = string
+
+    def message(self):
+        return self.string
+
+
 class OperatorId(IntEnum):
     ATOMIC = 0
     NEXT = 1
@@ -46,7 +54,8 @@ class LTLfFlatTransformer(Transformer):
 
         if (len(args) - 1) % 2 == 0:
             subformulas = args[::2]
-            assert len(subformulas) == 2, "Variadic Release not supported!"
+            if len(subformulas) != 2:
+                raise UnsupportedOperator("Variadic Release is not supported!")
             lhs, rhs = subformulas
             id = self.pool.id((OperatorId.EQUALS, lhs, rhs))
             self.reification.add(
@@ -65,7 +74,8 @@ class LTLfFlatTransformer(Transformer):
 
         if (len(args) - 1) % 2 == 0:
             subformulas = args[::2]
-            assert len(subformulas) == 2, "Variadic Implies not supported!"
+            if len(subformulas) != 2:
+                raise UnsupportedOperator("Variadic Implication is not supported!")
             lhs, rhs = subformulas
             id = self.pool.id((OperatorId.IMPLIES, lhs, rhs))
             self.reification.add(
@@ -118,7 +128,8 @@ class LTLfFlatTransformer(Transformer):
 
         if (len(args) - 1) % 2 == 0:
             subformulas = args[::2]
-            assert len(subformulas) == 2, "Variadic Release not supported!"
+            if len(subformulas) != 2:
+                raise UnsupportedOperator("Variadic Until is not supported!")
             lhs, rhs = subformulas
             id = self.pool.id((OperatorId.UNTIL, lhs, rhs))
             self.reification.add(
@@ -136,7 +147,8 @@ class LTLfFlatTransformer(Transformer):
 
         if (len(args) - 1) % 2 == 0:
             subformulas = args[::2]
-            assert len(subformulas) == 2, "Variadic WeakUntil not supported!"
+            if len(subformulas) != 2:
+                raise UnsupportedOperator("Variadic WeakUntil is not supported!")
             lhs, rhs = subformulas
             id = self.pool.id((OperatorId.WEAK_UNTIL, lhs, rhs))
             self.reification.add(
@@ -155,7 +167,8 @@ class LTLfFlatTransformer(Transformer):
 
         if (len(args) - 1) % 2 == 0:
             subformulas = args[::2]
-            assert len(subformulas) == 2, "Variadic Release not supported!"
+            if len(subformulas) != 2:
+                raise UnsupportedOperator("Variadic Release is not supported!")
             lhs, rhs = subformulas
             id = self.pool.id((OperatorId.RELEASE, lhs, rhs))
             self.reification.add(
@@ -174,7 +187,8 @@ class LTLfFlatTransformer(Transformer):
 
         if (len(args) - 1) % 2 == 0:
             subformulas = args[::2]
-            assert len(subformulas) == 2, "Variadic StrongRelease not supported!"
+            if len(subformulas) != 2:
+                raise UnsupportedOperator("Variadic StrongRelease is not supported!")
             lhs, rhs = subformulas
             id = self.pool.id((OperatorId.RELEASE, lhs, rhs))
             self.reification.add(
