@@ -2,7 +2,7 @@ from lark import Lark, Transformer  # type: ignore
 from pathlib import Path
 import clingo  # type: ignore
 from pysat.formula import IDPool  # type: ignore
-from enum import IntEnum
+from ltlf2asp.constants import Constants
 
 
 class ParsingError(Exception):
@@ -17,23 +17,6 @@ class UnsupportedOperator(Exception):
         return self.string
 
 
-class OperatorId(IntEnum):
-    ATOMIC = 0
-    NEXT = 1
-    WEAK_NEXT = 2
-    EVENTUALLY = 3
-    ALWAYS = 4
-    NEGATE = 5
-    IMPLIES = 6
-    CONJUNCTION = 7
-    DISJUNCTION = 8
-    EQUALS = 9
-    UNTIL = 10
-    RELEASE = 11
-    STRONG_RELEASE = 12
-    WEAK_UNTIL = 13
-
-
 class LTLfFlatTransformer(Transformer):
     def __init__(self):
         """Initialize."""
@@ -42,7 +25,7 @@ class LTLfFlatTransformer(Transformer):
         self.reification = set()
 
     def start(self, args):
-        self.reification.add(clingo.Function("root", [clingo.Number(args[0])]))
+        self.reification.add(clingo.Function(Constants.ROOT, [clingo.Number(args[0])]))
         return self.reification
 
     def ltlf_formula(self, args):
@@ -57,10 +40,10 @@ class LTLfFlatTransformer(Transformer):
             if len(subformulas) != 2:
                 raise UnsupportedOperator("Variadic Release is not supported!")
             lhs, rhs = subformulas
-            id = self.pool.id((OperatorId.EQUALS, lhs, rhs))
+            id = self.pool.id((Constants.EQUALS, lhs, rhs))
             self.reification.add(
                 clingo.Function(
-                    "equivalent",
+                    Constants.EQUALS,
                     [clingo.Number(id), clingo.Number(lhs), clingo.Number(rhs)],
                 )
             )
@@ -77,10 +60,10 @@ class LTLfFlatTransformer(Transformer):
             if len(subformulas) != 2:
                 raise UnsupportedOperator("Variadic Implication is not supported!")
             lhs, rhs = subformulas
-            id = self.pool.id((OperatorId.IMPLIES, lhs, rhs))
+            id = self.pool.id((Constants.IMPLIES, lhs, rhs))
             self.reification.add(
                 clingo.Function(
-                    "implies",
+                    Constants.IMPLIES,
                     [clingo.Number(id), clingo.Number(lhs), clingo.Number(rhs)],
                 )
             )
@@ -94,11 +77,11 @@ class LTLfFlatTransformer(Transformer):
 
         if (len(args) - 1) % 2 == 0:
             subformulas = args[::2]
-            id = self.pool.id((OperatorId.DISJUNCTION, *subformulas))
+            id = self.pool.id((Constants.DISJUNCTION, *subformulas))
             for x in subformulas:
                 self.reification.add(
                     clingo.Function(
-                        "disjunction", [clingo.Number(id), clingo.Number(x)]
+                        Constants.DISJUNCTION, [clingo.Number(id), clingo.Number(x)]
                     )
                 )
             return id
@@ -111,11 +94,11 @@ class LTLfFlatTransformer(Transformer):
 
         if (len(args) - 1) % 2 == 0:
             subformulas = args[::2]
-            id = self.pool.id((OperatorId.CONJUNCTION, *subformulas))
+            id = self.pool.id((Constants.CONJUNCTION, *subformulas))
             for x in subformulas:
                 self.reification.add(
                     clingo.Function(
-                        "conjunction", [clingo.Number(id), clingo.Number(x)]
+                        Constants.CONJUNCTION, [clingo.Number(id), clingo.Number(x)]
                     )
                 )
             return id
@@ -131,10 +114,11 @@ class LTLfFlatTransformer(Transformer):
             if len(subformulas) != 2:
                 raise UnsupportedOperator("Variadic Until is not supported!")
             lhs, rhs = subformulas
-            id = self.pool.id((OperatorId.UNTIL, lhs, rhs))
+            id = self.pool.id((Constants.UNTIL, lhs, rhs))
             self.reification.add(
                 clingo.Function(
-                    "until", [clingo.Number(id), clingo.Number(lhs), clingo.Number(rhs)]
+                    Constants.UNTIL,
+                    [clingo.Number(id), clingo.Number(lhs), clingo.Number(rhs)],
                 )
             )
             return id
@@ -150,10 +134,10 @@ class LTLfFlatTransformer(Transformer):
             if len(subformulas) != 2:
                 raise UnsupportedOperator("Variadic WeakUntil is not supported!")
             lhs, rhs = subformulas
-            id = self.pool.id((OperatorId.WEAK_UNTIL, lhs, rhs))
+            id = self.pool.id((Constants.WEAK_UNTIL, lhs, rhs))
             self.reification.add(
                 clingo.Function(
-                    "weak_until",
+                    Constants.WEAK_UNTIL,
                     [clingo.Number(id), clingo.Number(lhs), clingo.Number(rhs)],
                 )
             )
@@ -170,10 +154,10 @@ class LTLfFlatTransformer(Transformer):
             if len(subformulas) != 2:
                 raise UnsupportedOperator("Variadic Release is not supported!")
             lhs, rhs = subformulas
-            id = self.pool.id((OperatorId.RELEASE, lhs, rhs))
+            id = self.pool.id((Constants.RELEASE, lhs, rhs))
             self.reification.add(
                 clingo.Function(
-                    "release",
+                    Constants.RELEASE,
                     [clingo.Number(id), clingo.Number(lhs), clingo.Number(rhs)],
                 )
             )
@@ -190,10 +174,10 @@ class LTLfFlatTransformer(Transformer):
             if len(subformulas) != 2:
                 raise UnsupportedOperator("Variadic StrongRelease is not supported!")
             lhs, rhs = subformulas
-            id = self.pool.id((OperatorId.RELEASE, lhs, rhs))
+            id = self.pool.id((Constants.RELEASE, lhs, rhs))
             self.reification.add(
                 clingo.Function(
-                    "strong_release",
+                    Constants.STRONG_RELEASE,
                     [clingo.Number(id), clingo.Number(lhs), clingo.Number(rhs)],
                 )
             )
@@ -205,9 +189,11 @@ class LTLfFlatTransformer(Transformer):
         if len(args) == 1:
             return args[0]
 
-        id = self.pool.id((OperatorId.ALWAYS, args[1]))
+        id = self.pool.id((Constants.ALWAYS, args[1]))
         self.reification.add(
-            clingo.Function("always", [clingo.Number(id), clingo.Number(args[1])])
+            clingo.Function(
+                Constants.ALWAYS, [clingo.Number(id), clingo.Number(args[1])]
+            )
         )
         return id
 
@@ -215,9 +201,11 @@ class LTLfFlatTransformer(Transformer):
         if len(args) == 1:
             return args[0]
 
-        id = self.pool.id((OperatorId.EVENTUALLY, args[1]))
+        id = self.pool.id((Constants.EVENTUALLY, args[1]))
         self.reification.add(
-            clingo.Function("eventually", [clingo.Number(id), clingo.Number(args[1])])
+            clingo.Function(
+                Constants.EVENTUALLY, [clingo.Number(id), clingo.Number(args[1])]
+            )
         )
         return id
 
@@ -225,9 +213,9 @@ class LTLfFlatTransformer(Transformer):
         if len(args) == 1:
             return args[0]
 
-        id = self.pool.id((OperatorId.NEXT, args[1]))
+        id = self.pool.id((Constants.NEXT, args[1]))
         self.reification.add(
-            clingo.Function("next", [clingo.Number(id), clingo.Number(args[1])])
+            clingo.Function(Constants.NEXT, [clingo.Number(id), clingo.Number(args[1])])
         )
         return id
 
@@ -235,9 +223,11 @@ class LTLfFlatTransformer(Transformer):
         if len(args) == 1:
             return args[0]
 
-        id = self.pool.id((OperatorId.WEAK_NEXT, args[1]))
+        id = self.pool.id((Constants.WEAK_NEXT, args[1]))
         self.reification.add(
-            clingo.Function("weak_next", [clingo.Number(id), clingo.Number(args[1])])
+            clingo.Function(
+                Constants.WEAK_NEXT, [clingo.Number(id), clingo.Number(args[1])]
+            )
         )
         return id
 
@@ -245,9 +235,11 @@ class LTLfFlatTransformer(Transformer):
         if len(args) == 1:
             return args[0]
 
-        id = self.pool.id((OperatorId.NEGATE, args[1]))
+        id = self.pool.id((Constants.NEGATE, args[1]))
         self.reification.add(
-            clingo.Function("negate", [clingo.Number(id), clingo.Number(args[1])])
+            clingo.Function(
+                Constants.NEGATE, [clingo.Number(id), clingo.Number(args[1])]
+            )
         )
         return id
 
@@ -265,36 +257,38 @@ class LTLfFlatTransformer(Transformer):
             return args[0]
 
         if isinstance(args[0], str):
-            if args[0].lower() == "true":
+            if args[0].lower() == Constants.TRUE:
                 return self.ltlf_true(args)
 
-            if args[0].lower() == "false":
+            if args[0].lower() == Constants.FALSE:
                 return self.ltlf_false(args)
 
-            if args[0].lower() in ("last", "end"):
+            if args[0].lower() in (Constants.LAST, Constants.END):
                 return self.ltlf_last(args)
 
-            id = self.pool.id((OperatorId.ATOMIC, args[0]))
+            id = self.pool.id((Constants.ATOMIC, args[0]))
             self.reification.add(
-                clingo.Function("atomic", [clingo.Number(id), clingo.String(args[0])])
+                clingo.Function(
+                    Constants.ATOMIC, [clingo.Number(id), clingo.String(args[0])]
+                )
             )
             return id
 
         raise ParsingError
 
     def ltlf_true(self, _args):
-        id = self.pool.id((OperatorId.ATOMIC, "true"))
-        self.reification.add(clingo.Function("true", [clingo.Number(id)]))
+        id = self.pool.id(Constants.TRUE)
+        self.reification.add(clingo.Function(Constants.TRUE, [clingo.Number(id)]))
         return id
 
     def ltlf_false(self, _args):
-        id = self.pool.id((OperatorId.ATOMIC, "false"))
-        self.reification.add(clingo.Function("false", [clingo.Number(id)]))
+        id = self.pool.id(Constants.FALSE)
+        self.reification.add(clingo.Function(Constants.FALSE, [clingo.Number(id)]))
         return id
 
     def ltlf_last(self, _args):
-        id = self.pool.id((OperatorId.ATOMIC, "last"))
-        self.reification.add(clingo.Function("last", [clingo.Number(id)]))
+        id = self.pool.id(Constants.LAST)
+        self.reification.add(clingo.Function(Constants.LAST, [clingo.Number(id)]))
         return id
 
 
