@@ -1,0 +1,71 @@
+start: ltlf_formula
+
+?ltlf_formula:     ltlf_equivalence
+?ltlf_equivalence: ltlf_implication (EQUIVALENCE ltlf_implication)*
+?ltlf_implication: ltlf_or (IMPLY ltlf_or)*
+?ltlf_or:          ltlf_and (OR ltlf_and)*
+?ltlf_and:         ltlf_until (AND ltlf_until)*
+?ltlf_until:       ltlf_release (UNTIL ltlf_release)*
+?ltlf_release:     ltlf_unaryop (RELEASE ltlf_unaryop)*
+
+?ltlf_unaryop:     ltlf_always
+             |     ltlf_eventually
+             |     ltlf_next
+             |     ltlf_weak_next
+             |     ltlf_not
+             |     ltlf_wrapped
+
+?ltlf_always:      ALWAYS ltlf_unaryop
+?ltlf_eventually:  EVENTUALLY ltlf_unaryop
+?ltlf_next:        NEXT ltlf_unaryop
+?ltlf_weak_next:   WEAK_NEXT ltlf_unaryop
+?ltlf_not:         NOT ltlf_unaryop
+?ltlf_wrapped:     ltlf_atom
+             |     LSEPARATOR ltlf_formula RSEPARATOR
+
+ltlf_true: TRUE
+ltlf_false: FALSE
+ltlf_last: LAST
+
+ltlf_atom:         clingo_symbol
+          |        uppercase_symbol
+          |        quoted_symbol
+          |        ltlf_true
+          |        ltlf_false
+          |        ltlf_last
+
+
+
+uppercase_symbol: /[A-Z]+[A-Za-z_0-9]*/
+quoted_symbol: "\"" /[a-z0-9A-Z_]+/"\""
+
+clingo_symbol: PREDICATE_NAME (LSEPARATOR clingo_term ("," clingo_term)* RSEPARATOR)?
+clingo_term:  integer
+           |  string
+           |  clingo_symbol
+
+integer: /[1-9]+[0-9]*/ | /0/
+string: "\"" /[a-zA-Z0-9]+/ "\""
+
+// Operators must not be part of a word
+UNTIL: "U"
+RELEASE: "R"
+ALWAYS: "G"
+EVENTUALLY: "F"
+NEXT: "X"
+WEAK_NEXT: "WX"
+LAST: "Last" | "End" | "last" | "end" | "END"
+TRUE: "True" | "true" | "TRUE"
+FALSE: "False" | "false" | "FALSE"
+NOT: "!" | "~"
+OR: "|" | "||"
+AND: "&" | "&&"
+EQUIVALENCE: "=" | "<->" | "<=>"
+IMPLY: "->" | "=>"
+LSEPARATOR: "("
+RSEPARATOR: ")"
+
+// Symbols cannot contain uppercase letters, because these are reserved
+PREDICATE_NAME: /[a-z][a-z0-9_A-Z]*/
+
+%ignore /\s+/
