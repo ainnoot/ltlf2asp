@@ -1,22 +1,23 @@
 from typing import Set, Optional, Tuple, List
-import clingo
-from ltlf2asp.solve.decode_model import State
+import clingo  # type: ignore
+from ltlf2asp.solve.decode_model import State, SolveResult, SolveStatus, Model
 from ltlf2asp.solve import SOLVE_INCREMENTAL
 
 
 class Catch:
     def __init__(self) -> None:
-        self.model: Optional[Tuple[State, ...]] = None
+        self.states: Optional[Tuple[State, ...]] = None
 
-    def __call__(self, model: clingo.Model):
-        self.model = State.from_clingo_model(model)
+    def __call__(self, model: clingo.Model) -> bool:
+        self.states = State.from_clingo_model(model)
         return False
 
-    def get(self):
-        return self.model
+    def get(self) -> Tuple[State, ...]:
+        assert self.states is not None
+        return self.states
 
 
-def solve(f: Set[clingo.Symbol], max_horizon, strategy):
+def solve(f: Set[clingo.Symbol], max_horizon: int) -> SolveResult:
     a, b = 0, 1
     ctl = clingo.Control()
 
@@ -43,9 +44,10 @@ def solve(f: Set[clingo.Symbol], max_horizon, strategy):
         ans = ctl.solve(on_model=trace_cb)
 
         if ans.satisfiable:
-            return trace_cb.get()
+            model = Model(trace_cb.get())
+            return SolveResult(SolveStatus.SATISFIABLE, b, model)
 
         ctl.assign_external(search, False)
-        a, b = strategy(a, b)
+        a, b = b, 2 * b
 
-    return None
+    return SolveResult(SolveStatus.UNSATISFIABLE, a, None)
