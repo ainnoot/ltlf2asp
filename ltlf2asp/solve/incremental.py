@@ -1,15 +1,15 @@
-from typing import Set, Optional
+from typing import Set, Optional, Tuple, List
 import clingo
-from ltlf2asp.solve.decode_model import Model
-from ltlf2asp.solve import INCREMENTAL
+from ltlf2asp.solve.decode_model import State
+from ltlf2asp.solve import SOLVE_INCREMENTAL
 
 
 class Catch:
-    def __init__(self):
-        self.model: Optional[Model] = None
+    def __init__(self) -> None:
+        self.model: Optional[Tuple[State, ...]] = None
 
     def __call__(self, model: clingo.Model):
-        self.model = Model.from_clingo_model(model)
+        self.model = State.from_clingo_model(model)
         return False
 
     def get(self):
@@ -24,8 +24,8 @@ def solve(f: Set[clingo.Symbol], max_horizon, strategy):
         for symbol in f:
             be.add_rule([be.add_atom(symbol)], [])
 
-    ctl.load(INCREMENTAL)
-    parts = [("base", []), ("formula", [])]
+    ctl.load(SOLVE_INCREMENTAL)
+    parts: List[Tuple[str, List[clingo.Symbol]]] = [("base", []), ("formula", [])]
     while b <= max_horizon:
         for t in range(a, b):
             parts.append(("semantics", [clingo.Number(t)]))
