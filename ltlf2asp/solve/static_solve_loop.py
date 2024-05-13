@@ -1,6 +1,6 @@
 from typing import Optional, Iterable, Tuple
 from ltlf2asp.solve.decode_model import Model, State, SolveResult, SolveStatus
-import clingo
+import clingo  # type: ignore
 from ltlf2asp.solve import SOLVE_STATIC
 
 
