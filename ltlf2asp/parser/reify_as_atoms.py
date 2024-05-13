@@ -53,7 +53,7 @@ class ReifyFormulaAsFacts(Reify[int, Set[clingo.Symbol]]):
         return id
 
     def reify_variadic(self, fs: Tuple[int], name: str):
-        id = self.pool.id((name, *fs))
+        id = self.pool.id((name, *sorted(fs)))
         for f in fs:
             self.facts.add(clingo_symbol(name, [id, f]))
         return id
