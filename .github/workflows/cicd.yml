@@ -47,7 +47,7 @@ jobs:
       if: steps.black.outputs.cache-hit != 'true'
       run: |
         wget https://github.com/black-sat/black/releases/download/v0.10.6/black-sat-0.10.6.ubuntu20.04.x86_64.deb
-        ls
+        mkdir black-install-folder
         mv black-sat-0.10.6.ubuntu20.04.x86_64.deb black-install-folder/black-sat-0.10.6.ubuntu20.04.x86_64.deb
     - name: Install BLACK
       run: | 
