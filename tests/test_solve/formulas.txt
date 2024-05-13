@@ -1,7 +1,5 @@
-0
 false R (X(p9))
 false R ((X((X(p3)) M (G(X(X(X(p24))))))) W ((p23) M (p12)))
-1
 true U (F(p17))
 true U ((p0) <-> (X(p3)))
 true U (X(G(X(X((X(p11)) W (X(p23)))))))
