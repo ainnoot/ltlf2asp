@@ -38,7 +38,7 @@ def _solve(f: Iterable[clingo.Symbol], a: int, b: int):
 
 def solve(f: Iterable[clingo.Symbol], max_horizon):
     a, b = 0, 1
-    while b < max_horizon:
+    while b <= max_horizon:
         model = _solve(f, a, b)
         if model is not None:
             return model

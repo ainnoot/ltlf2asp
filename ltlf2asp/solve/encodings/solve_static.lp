@@ -7,7 +7,7 @@ time(0..T) :- last_instant(T).
 :- root(X), not holds(0, X).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Atomic Formula %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-holds(T, X) :- atomic(X, A), time(T).
+holds(T, X) :- atomic(X, A), time(T), trace(T, A).
 holds(T, X) :- last(X), last_instant(T).
 holds(T, X) :- true(X), time(T).
 
@@ -29,12 +29,12 @@ holds(T, X) :- release(X, LHS, RHS), holds(T,RHS), last_instant(T).
 #show trace/2.
 
 
-#defined atomic/2.
 #defined true/1.
 #defined false/1.
 #defined last/1.
 #defined negate/2.
 #defined conjunction/2.
+#defined atomic/2.
 #defined disjunction/2.
 #defined trace/2.
 #defined next/2.
