@@ -39,7 +39,7 @@ jobs:
 
     - name: Load cache
       id: black
-      uses: actions/cache
+      uses: actions/cache@v4
       with:
         path: black-install-folder
         key: black-sat
