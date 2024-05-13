@@ -52,7 +52,7 @@ jobs:
 
     - name: Install BLACK
       run: | 
-        sudo apt install -y black-install-folder/black-sat-0.10.6.ubuntu20.04.x86_64.deb
+        sudo apt install -y ./black-install-folder/black-sat-0.10.6.ubuntu20.04.x86_64.deb
         echo $(which black)
 
     - name: Activate a Poetry shell
