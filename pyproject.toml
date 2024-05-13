@@ -22,3 +22,12 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 ltlf2asp = "ltlf2asp.cli:run"
+
+[tool.pytest.ini_options]
+markers = [
+    "slow"
+]
+
+filterwarnings = [
+    "ignore::DeprecationWarning"
+]
