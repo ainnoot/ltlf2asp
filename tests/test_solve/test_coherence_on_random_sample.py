@@ -22,6 +22,7 @@ def check_black_output(max_horizon, formula):
 
 
 @pytest.mark.parametrize("formula", sorted(FORMULAS, key=lambda x: random())[:50])
+@pytest.mark.random
 @pytest.mark.slow
 def test_ltlf2asp_and_black_agree_on_random_sample(formula):
     facts = parse_formula(formula)
