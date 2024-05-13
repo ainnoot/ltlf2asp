@@ -72,11 +72,11 @@ class Reify(Generic[T, G], ABC):
         pass
 
     @abstractmethod
-    def conjunction(self, fs: Tuple[T]) -> T:
+    def conjunction(self, fs: Tuple[T, ...]) -> T:
         pass
 
     @abstractmethod
-    def disjunction(self, fs: Tuple[T]) -> T:
+    def disjunction(self, fs: Tuple[T, ...]) -> T:
         pass
 
     @abstractmethod

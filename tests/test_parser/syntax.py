@@ -131,7 +131,7 @@ class Equivalence(Binary):
 
 @dataclass(frozen=True)
 class Variadic(Formula, ABC):
-    fs: Tuple[Formula]
+    fs: Tuple[Formula, ...]
 
     def __str__(self) -> str:
         return "({})".format((" " + self.symbol() + " ").join(str(x) for x in self.fs))
