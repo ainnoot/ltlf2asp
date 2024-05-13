@@ -39,7 +39,7 @@ holds(t,X) :- until(X,LHS,RHS), holds(t,RHS).
 holds(t,X) :- until(X,LHS,RHS), holds(t,LHS), holds(t+1,X).
 holds(t, X) :- release(X, LHS, RHS), holds(t,RHS), holds(t,LHS).
 holds(t, X) :- release(X, LHS, RHS), holds(t,RHS), holds(t+1, X).
-holds(T, X) :- release(X, LHS, RHS), holds(t,RHS), last_state(t).
+holds(t, X) :- release(X, LHS, RHS), holds(t,RHS), last_state(t).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% Propositional Formula %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 holds(t,X) :- negate(X,F), not holds(t,F), time(t).
@@ -62,3 +62,4 @@ holds(t,X) :- disjunction(X,F), holds(t,F).
 #defined next/2.
 #defined until/3.
 #defined release/3.
+#defined last_state/1.

@@ -30,7 +30,7 @@ def solve(f: Set[clingo.Symbol], max_horizon: int) -> SolveResult:
     while b <= max_horizon:
         for t in range(a, b):
             parts.append(("semantics", [clingo.Number(t)]))
-
+        parts.append(("search", [clingo.Number(a), clingo.Number(b)]))
         # Ground
         ctl.ground(parts)
         parts.clear()
