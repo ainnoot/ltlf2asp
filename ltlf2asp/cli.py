@@ -4,6 +4,8 @@ from pathlib import Path
 from ltlf2asp.solve.solver_interface import Solver
 from ltlf2asp.parser import parse_formula
 from dataclasses import dataclass
+from ltlf2asp.solve.check_model import check_trace
+from ltlf2asp.solve.parse_trace import parse_trace
 
 
 @dataclass(frozen=True)
@@ -69,9 +71,11 @@ def solve(args: SolveArguments):
 
 
 def check(args: CheckArguments):
-    formula = parse_formula(args.formula.read_text())  # noqa
-    trace = ...  # noqa
-    print('{"status": "Not yet implemented!"}')
+    formula = parse_formula(args.formula.read_text())
+    trace = parse_trace(args.trace.read_text())
+
+    ans = check_trace(trace, formula)
+    print(ans)
     return 0
 
 
