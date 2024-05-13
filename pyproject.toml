@@ -12,10 +12,13 @@ lark-parser = "^0.12.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
-ruff = "^0.4.3"
+ruff = "^0.4.4"
 black = "^24.4.2"
 mypy = "^1.10.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+ltlf2asp = "ltlf2asp.cli:run"
