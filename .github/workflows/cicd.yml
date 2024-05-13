@@ -49,16 +49,10 @@ jobs:
         wget https://github.com/black-sat/black/releases/download/v0.10.6/black-sat-0.10.6.ubuntu20.04.x86_64.deb
         mkdir black-install-folder
         mv black-sat-0.10.6.ubuntu20.04.x86_64.deb black-install-folder/black-sat-0.10.6.ubuntu20.04.x86_64.deb
+
     - name: Install BLACK
       run: | 
-        sudo apt install -y black-sat-0.10.6.ubuntu20.04.x86_64.deb
-
-    - name: Download BLACK DEB
-      id: download_black_from_deb
-      if: steps.install_black_from_deb.outputs.cache-hit != 'true'
-      run: |
-        wget "https://github.com/black-sat/black/releases/download/v0.10.6/black-sat-0.10.6-1.x86_64.deb"
-        sudo apt install -y black-sat-0.10.6-1.x86_64.deb
+        sudo apt install -y black-install-folder/black-sat-0.10.6.ubuntu20.04.x86_64.deb
         echo $(which black)
 
     - name: Activate a Poetry shell
