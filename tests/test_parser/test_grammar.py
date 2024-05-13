@@ -1,4 +1,4 @@
-from ltlf2asp.parser.reify_as_object import ReifyFormulaAsObject
+from tests.test_parser.reify_as_object import ReifyFormulaAsObject
 from ltlf2asp.parser.parser import _parse_formula
 from ltlf2asp.parser.syntax import (
     Proposition,
