@@ -56,7 +56,7 @@ jobs:
 
     - name: Change executable name for BLACK
       run: |
-        mv $(which black) /usr/bin/black-sat
+        sudo mv $(which black) /usr/bin/black-sat
 
     - name: Install Development dependencies
       run: poetry install --only=dev
