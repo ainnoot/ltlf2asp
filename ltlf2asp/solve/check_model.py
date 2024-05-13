@@ -5,11 +5,14 @@ import clingo  # type: ignore
 from ltlf2asp.solve.decode_model import State
 from ltlf2asp.solve import CHECK
 
+
 def trace_2(t: int, value: str, positive):
-    return clingo.Function('trace', [clingo.Number(t), clingo.String(value)], positive)
+    return clingo.Function("trace", [clingo.Number(t), clingo.String(value)], positive)
+
 
 def time_1(t: int):
-    return clingo.Function('time', [clingo.Number(t)])
+    return clingo.Function("time", [clingo.Number(t)])
+
 
 def check_trace(trace: Tuple[State, ...], formula: Iterable[clingo.Symbol]) -> bool:
     ctl = clingo.Control()
@@ -31,4 +34,4 @@ def check_trace(trace: Tuple[State, ...], formula: Iterable[clingo.Symbol]) -> b
     ctl.ground([("base", [])])
     ans = ctl.solve()
 
-    return ans.satisfiable
+    return not (ans.satisfiable is None or not ans.satisfiable)
