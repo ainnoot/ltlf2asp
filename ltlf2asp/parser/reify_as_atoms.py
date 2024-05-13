@@ -1,7 +1,7 @@
-from typing import Set, Iterable
+from collections import defaultdict
+from typing import Set, Iterable, Dict
 
 import clingo  # type: ignore
-from pysat.formula import IDPool  # type: ignore
 from ltlf2asp.parser.constants import Constants
 from ltlf2asp.parser.reify_interface import Reify
 
@@ -15,9 +15,23 @@ def add_in_backend(b: clingo.Backend, symbol: clingo.Symbol):
     b.add_rule([lit], [])
 
 
+class IDPool:
+    def __init__(self) -> None:
+        self.objects: Dict[object, int] = defaultdict(lambda: self._next_id())
+        self.i_: int = 1
+
+    def _next_id(self) -> int:
+        i = self.i_
+        self.i_ += 1
+        return i
+
+    def id(self, obj: object) -> int:
+        return self.objects[obj]
+
+
 class ReifyFormulaAsFacts(Reify[int, Set[clingo.Symbol]]):
-    def __init__(self):
-        self.pool = IDPool()
+    def __init__(self) -> None:
+        self.pool: IDPool = IDPool()
         self.facts: Set[clingo.Symbol] = set()
 
     def result(self) -> Set[clingo.Symbol]:
