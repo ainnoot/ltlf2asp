@@ -1,6 +1,7 @@
 from typing import Optional
 
 from ltlf2asp.parser.reify_interface import Reify
+from tests.test_parser import syntax
 
 
 class ReifyFormulaAsObject(Reify[syntax.Formula, Optional[syntax.Formula]]):
