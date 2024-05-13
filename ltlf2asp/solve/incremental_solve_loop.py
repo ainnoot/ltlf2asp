@@ -1,4 +1,4 @@
-from typing import Set, Optional, Tuple, List
+from typing import Optional, Tuple, List, Iterable
 import clingo  # type: ignore
 from ltlf2asp.solve.decode_model import State, SolveResult, SolveStatus, Model
 from ltlf2asp.solve import SOLVE_INCREMENTAL
@@ -17,7 +17,7 @@ class Catch:
         return self.states
 
 
-def solve(f: Set[clingo.Symbol], max_horizon: int) -> SolveResult:
+def solve(f: Iterable[clingo.Symbol], max_horizon: int) -> SolveResult:
     a, b = 0, 1
     ctl = clingo.Control()
 
