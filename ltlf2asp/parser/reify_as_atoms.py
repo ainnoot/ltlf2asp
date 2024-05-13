@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Set, Iterable, Dict
+from typing import Set, Dict, Tuple
 
 import clingo  # type: ignore
 from ltlf2asp.parser.constants import Constants
@@ -52,7 +52,7 @@ class ReifyFormulaAsFacts(Reify[int, Set[clingo.Symbol]]):
         self.facts.add(clingo_symbol(name, [id, lhs, rhs]))
         return id
 
-    def reify_variadic(self, fs: Iterable[int], name: str):
+    def reify_variadic(self, fs: Tuple[int], name: str):
         id = self.pool.id((name, *fs))
         for f in fs:
             self.facts.add(clingo_symbol(name, [id, f]))
