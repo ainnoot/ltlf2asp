@@ -7,7 +7,7 @@ time(0..T) :- last_instant(T).
 :- root(X), not holds(0, X).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Atomic Formula %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-holds(T, X) :- atomic(X, A).
+holds(T, X) :- atomic(X, A), time(T).
 holds(T, X) :- last(X), last_instant(T).
 holds(T, X) :- true(X), time(T).
 
