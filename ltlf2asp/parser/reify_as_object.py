@@ -1,12 +1,14 @@
+from typing import Optional
+
 from ltlf2asp.parser.reify_interface import Reify
 import ltlf2asp.parser.syntax as Syntax
 
 
-class ReifyFormulaAsObject(Reify[Syntax.Formula, Syntax.Formula]):
-    def __init__(self):
-        self.f = None
+class ReifyFormulaAsObject(Reify[Syntax.Formula, Optional[Syntax.Formula]]):
+    def __init__(self) -> None:
+        self.f: Optional[Syntax.Formula] = None
 
-    def result(self):
+    def result(self) -> Optional[Syntax.Formula]:
         return self.f
 
     def true(self) -> Syntax.Formula:
