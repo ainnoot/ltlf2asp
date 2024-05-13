@@ -31,6 +31,7 @@ class SolveResult:
 
             return json.dumps(unsat_json, indent=4)
 
+        assert self.model is not None
         sat_json = {
             "result": self.status,
             "k": self.k,
