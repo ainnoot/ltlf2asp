@@ -52,7 +52,7 @@ class ReifyFormulaAsFacts(Reify[int, Set[clingo.Symbol]]):
         self.facts.add(clingo_symbol(name, [id, lhs, rhs]))
         return id
 
-    def reify_variadic(self, fs: Tuple[int], name: str):
+    def reify_variadic(self, fs: Tuple[int, ...], name: str):
         id = self.pool.id((name, *sorted(fs)))
         for f in fs:
             self.facts.add(clingo_symbol(name, [id, f]))
@@ -80,7 +80,8 @@ class ReifyFormulaAsFacts(Reify[int, Set[clingo.Symbol]]):
         return self.reify_unary(f, Constants.NEXT)
 
     def weak_next(self, f) -> int:
-        return self.reify_unary(f, Constants.WEAK_NEXT)
+        # return self.reify_unary(f, Constants.WEAK_NEXT)
+        return self.disjunction((self.last(), self.next(f)))
 
     def until(self, lhs, rhs) -> int:
         return self.reify_binary(lhs, rhs, Constants.UNTIL)
@@ -89,30 +90,36 @@ class ReifyFormulaAsFacts(Reify[int, Set[clingo.Symbol]]):
         return self.reify_binary(lhs, rhs, Constants.RELEASE)
 
     def weak_until(self, lhs, rhs) -> int:
-        return self.reify_binary(lhs, rhs, Constants.WEAK_UNTIL)
+        # return self.reify_binary(lhs, rhs, Constants.WEAK_UNTIL)
+        return self.disjunction((self.until(lhs, rhs), self.always(lhs)))
 
     def strong_release(self, lhs, rhs) -> int:
-        return self.reify_binary(lhs, rhs, Constants.STRONG_RELEASE)
+        # return self.reify_binary(lhs, rhs, Constants.STRONG_RELEASE)
+        return self.conjunction((self.release(lhs, rhs), self.eventually(lhs)))
 
     def equivalence(self, lhs, rhs) -> int:
-        return self.reify_binary(lhs, rhs, Constants.EQUALS)
+        # return self.reify_binary(lhs, rhs, Constants.EQUALS)
+        return self.conjunction((self.implies(lhs, rhs), self.implies(rhs, lhs)))
 
     def implies(self, lhs, rhs) -> int:
-        return self.reify_binary(lhs, rhs, Constants.IMPLIES)
+        # return self.reify_binary(lhs, rhs, Constants.IMPLIES)
+        return self.disjunction((self.negate(lhs), rhs))
 
     def eventually(self, f) -> int:
-        return self.reify_unary(f, Constants.EVENTUALLY)
+        # return self.reify_unary(f, Constants.EVENTUALLY)
+        return self.until(self.true(), f)
 
     def always(self, f) -> int:
-        return self.reify_unary(f, Constants.ALWAYS)
+        # return self.reify_unary(f, Constants.ALWAYS)
+        return self.release(self.false(), f)
 
     def negate(self, f) -> int:
         return self.reify_unary(f, Constants.NEGATE)
 
-    def conjunction(self, fs) -> int:
+    def conjunction(self, fs: Tuple[int, ...]) -> int:
         return self.reify_variadic(fs, Constants.CONJUNCTION)
 
-    def disjunction(self, fs) -> int:
+    def disjunction(self, fs: Tuple[int, ...]) -> int:
         return self.reify_variadic(fs, Constants.DISJUNCTION)
 
     def mark_as_root(self, f) -> None:
