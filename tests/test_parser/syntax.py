@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
-from typing import Tuple
+from typing import Sequence
 
 
 @dataclass(frozen=True)
@@ -131,7 +131,7 @@ class Equivalence(Binary):
 
 @dataclass(frozen=True)
 class Variadic(Formula, ABC):
-    fs: Tuple[Formula, ...]
+    fs: Sequence[Formula]
 
     def __str__(self) -> str:
         return "({})".format((" " + self.symbol() + " ").join(str(x) for x in self.fs))

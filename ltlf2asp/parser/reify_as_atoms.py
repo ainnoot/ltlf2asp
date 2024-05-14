@@ -1,16 +1,16 @@
 from collections import defaultdict
-from typing import Set, Dict, Tuple
+from typing import Set, Dict, Sequence
 
 import clingo  # type: ignore
 from ltlf2asp.parser.constants import Constants
 from ltlf2asp.parser.reify_interface import Reify
 
 
-def clingo_symbol(name, args):
+def clingo_symbol(name: str, args: Sequence[int]) -> clingo.Symbol:
     return clingo.Function(name, [clingo.Number(x) for x in args])
 
 
-def add_in_backend(b: clingo.Backend, symbol: clingo.Symbol):
+def add_in_backend(b: clingo.Backend, symbol: clingo.Symbol) -> None:
     lit = b.add_atom(symbol)
     b.add_rule([lit], [])
 
@@ -31,28 +31,29 @@ class IDPool:
 
 class ReifyFormulaAsFacts(Reify[int, Set[clingo.Symbol]]):
     def __init__(self) -> None:
+        super().__init__()
         self.pool: IDPool = IDPool()
         self.facts: Set[clingo.Symbol] = set()
 
     def result(self) -> Set[clingo.Symbol]:
         return self.facts
 
-    def constant(self, name: str):
+    def constant(self, name: str) -> int:
         id = self.pool.id((name,))
         self.facts.add(clingo_symbol(name, [id]))
         return id
 
-    def reify_unary(self, f: int, name: str):
+    def reify_unary(self, f: int, name: str) -> int:
         id = self.pool.id((name, f))
         self.facts.add(clingo_symbol(name, [id, f]))
         return id
 
-    def reify_binary(self, lhs: int, rhs: int, name: str):
+    def reify_binary(self, lhs: int, rhs: int, name: str) -> int:
         id = self.pool.id((name, lhs, rhs))
         self.facts.add(clingo_symbol(name, [id, lhs, rhs]))
         return id
 
-    def reify_variadic(self, fs: Tuple[int, ...], name: str):
+    def reify_variadic(self, fs: Sequence[int], name: str) -> int:
         id = self.pool.id((name, *sorted(fs)))
         for f in fs:
             self.facts.add(clingo_symbol(name, [id, f]))
@@ -79,48 +80,48 @@ class ReifyFormulaAsFacts(Reify[int, Set[clingo.Symbol]]):
     def next(self, f: int) -> int:
         return self.reify_unary(f, Constants.NEXT)
 
-    def weak_next(self, f) -> int:
+    def weak_next(self, f: int) -> int:
         # return self.reify_unary(f, Constants.WEAK_NEXT)
         return self.disjunction((self.last(), self.next(f)))
 
-    def until(self, lhs, rhs) -> int:
+    def until(self, lhs: int, rhs: int) -> int:
         return self.reify_binary(lhs, rhs, Constants.UNTIL)
 
-    def release(self, lhs, rhs) -> int:
+    def release(self, lhs: int, rhs: int) -> int:
         return self.reify_binary(lhs, rhs, Constants.RELEASE)
 
-    def weak_until(self, lhs, rhs) -> int:
+    def weak_until(self, lhs: int, rhs: int) -> int:
         # return self.reify_binary(lhs, rhs, Constants.WEAK_UNTIL)
         return self.disjunction((self.until(lhs, rhs), self.always(lhs)))
 
-    def strong_release(self, lhs, rhs) -> int:
+    def strong_release(self, lhs: int, rhs: int) -> int:
         # return self.reify_binary(lhs, rhs, Constants.STRONG_RELEASE)
         return self.conjunction((self.release(lhs, rhs), self.eventually(lhs)))
 
-    def equivalence(self, lhs, rhs) -> int:
+    def equivalence(self, lhs: int, rhs: int) -> int:
         # return self.reify_binary(lhs, rhs, Constants.EQUALS)
         return self.conjunction((self.implies(lhs, rhs), self.implies(rhs, lhs)))
 
-    def implies(self, lhs, rhs) -> int:
+    def implies(self, lhs: int, rhs: int) -> int:
         # return self.reify_binary(lhs, rhs, Constants.IMPLIES)
         return self.disjunction((self.negate(lhs), rhs))
 
-    def eventually(self, f) -> int:
+    def eventually(self, f: int) -> int:
         # return self.reify_unary(f, Constants.EVENTUALLY)
         return self.until(self.true(), f)
 
-    def always(self, f) -> int:
+    def always(self, f: int) -> int:
         # return self.reify_unary(f, Constants.ALWAYS)
         return self.release(self.false(), f)
 
-    def negate(self, f) -> int:
+    def negate(self, f: int) -> int:
         return self.reify_unary(f, Constants.NEGATE)
 
-    def conjunction(self, fs: Tuple[int, ...]) -> int:
+    def conjunction(self, fs: Sequence[int]) -> int:
         return self.reify_variadic(fs, Constants.CONJUNCTION)
 
-    def disjunction(self, fs: Tuple[int, ...]) -> int:
+    def disjunction(self, fs: Sequence[int]) -> int:
         return self.reify_variadic(fs, Constants.DISJUNCTION)
 
-    def mark_as_root(self, f) -> None:
+    def mark_as_root(self, f: int) -> None:
         self.facts.add(clingo_symbol(Constants.ROOT, [f]))

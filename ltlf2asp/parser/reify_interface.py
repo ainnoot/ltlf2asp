@@ -1,12 +1,15 @@
 from abc import ABC, abstractmethod
 
-from typing import TypeVar, Generic, Tuple
+from typing import TypeVar, Generic, Sequence
 
 T = TypeVar("T")
 G = TypeVar("G")
 
 
 class Reify(Generic[T, G], ABC):
+    def __init__(self) -> None:
+        pass
+
     @abstractmethod
     def result(self) -> G:
         pass
@@ -72,13 +75,13 @@ class Reify(Generic[T, G], ABC):
         pass
 
     @abstractmethod
-    def conjunction(self, fs: Tuple[T, ...]) -> T:
+    def conjunction(self, fs: Sequence[T]) -> T:
         pass
 
     @abstractmethod
-    def disjunction(self, fs: Tuple[T, ...]) -> T:
+    def disjunction(self, fs: Sequence[T]) -> T:
         pass
 
     @abstractmethod
-    def mark_as_root(self, f) -> None:
+    def mark_as_root(self, f: T) -> None:
         pass

@@ -1,6 +1,8 @@
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
+from typing import Sequence
+
 from ltlf2asp.solve.solver_interface import Solver
 from ltlf2asp.parser import parse_formula
 from dataclasses import dataclass
@@ -15,7 +17,7 @@ class SolveArguments:
     quiet: bool
     search_horizon: int
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not self.formula.is_file():
             raise RuntimeError("Formula does not exist.")
 
@@ -28,7 +30,7 @@ class CheckArguments:
     formula: Path
     trace: Path
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not self.formula.is_file():
             raise RuntimeError("Formula file does not exist.")
 
@@ -36,7 +38,7 @@ class CheckArguments:
             raise RuntimeError("Trace file does not exist.")
 
 
-def parse_check_args(argv) -> CheckArguments:
+def parse_check_args(argv: Sequence[str]) -> CheckArguments:
     p = ArgumentParser()
     p.add_argument("trace", type=Path)
     p.add_argument("formula", type=Path)
@@ -45,7 +47,7 @@ def parse_check_args(argv) -> CheckArguments:
     return CheckArguments(**args.__dict__)
 
 
-def parse_solve_args(argv) -> SolveArguments:
+def parse_solve_args(argv: Sequence[str]) -> SolveArguments:
     p = ArgumentParser()
     p.add_argument("formula", type=Path)
     p.add_argument("search_horizon", type=int)
@@ -57,7 +59,7 @@ def parse_solve_args(argv) -> SolveArguments:
     return SolveArguments(**args.__dict__)
 
 
-def solve(args: SolveArguments):
+def solve(args: SolveArguments) -> int:
     formula = parse_formula(args.formula.read_text())
     solver = Solver(args.incremental, args.search_horizon)
     result = solver.solve(formula)
@@ -70,7 +72,7 @@ def solve(args: SolveArguments):
     return 0
 
 
-def check(args: CheckArguments):
+def check(args: CheckArguments) -> int:
     formula = parse_formula(args.formula.read_text())
     trace = parse_trace(args.trace.read_text())
 
@@ -79,7 +81,7 @@ def check(args: CheckArguments):
     return 0
 
 
-def run():
+def run() -> int:
     argv = sys.argv[1:]
     if len(argv) <= 2:
         print("Usage:")

@@ -17,13 +17,13 @@ class SolveResult:
     k: int
     model: Optional["Model"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "{}[{}]".format(self.status.value, self.k)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__repr__()
 
-    def json(self):
+    def json(self) -> str:
         import json
 
         if self.status == SolveStatus.UNSATISFIABLE:
