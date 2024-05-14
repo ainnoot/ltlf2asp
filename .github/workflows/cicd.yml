@@ -18,10 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Dump GitHub Context
-      env: { CONTENT: "${{ toJson(github) }}" }
+      env: { CONTENT: "${{ toJson(github.event) }}" }
       run: |
         "echo $CONTENT | jq"
-        "echo ${{ toJson(github.event) }} | jq"
 
   lint_test_and_build:
     runs-on: ubuntu-latest
