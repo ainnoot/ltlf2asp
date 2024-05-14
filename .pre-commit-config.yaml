@@ -9,14 +9,10 @@ default_install_hook_types:
 fail_fast: true
 
 repos:
-- repo: local
+- repo: https://github.com/ainnoot/commit-message-pre-commit
+  rev: 0.3.1
   hooks:
-      - id: commit-msg
-        name: validate commit-msg
-        language: python
-        language_version: "3.12"
-        entry: python3 .hooks/commit-msg
-        stages: [ commit-msg ]
+      - id: commit-message-check
 
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.2.0
@@ -49,4 +45,5 @@ repos:
     hooks:
     -   id: mypy
         args: [--ignore-missing-imports]
+        name: Type-checking with mypy
         stages: [ pre-commit ]
