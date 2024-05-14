@@ -1,3 +1,5 @@
+#! /usr/bin/bash
+
 REF=$1
 ACTOR=$2
 REPO=$3
