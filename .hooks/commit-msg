@@ -5,24 +5,27 @@ import sys
 from pathlib import Path
 
 KNOWN_TYPES = (
-    'fix',
-    'feat',
-    'build',
-    'chore',
-    'ci',
-    'docs',
-    'style',
-    'refactor',
-    'perf',
-    'test'
+    "fix",
+    "feat",
+    "build",
+    "chore",
+    "ci",
+    "docs",
+    "style",
+    "refactor",
+    "perf",
+    "test",
 )
+
 
 def validate_commit_message(message):
     type_re = r"^([a-z]+[a-z_\-]+)"
     scope_re = r"(\([a-z]+[a-z_\-]+\))?"
     danger_re = r"(\!)?"
     commit_re = r"(.+)$"
-    pattern = r'^{type}{scope}{danger}\: {msg}$'.format(type=type_re, scope=scope_re, danger=danger_re, msg=commit_re)
+    pattern = r"^{type}{scope}{danger}\: {msg}$".format(
+        type=type_re, scope=scope_re, danger=danger_re, msg=commit_re
+    )
 
     match = re.match(pattern, message)
     if not match:
