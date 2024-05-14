@@ -26,7 +26,10 @@ jobs:
     steps:
       - name: Notify pipeline start
         run: |
-          echo "Pipeline start!"
+          curl \
+            -H "Title: Start CI/CD Pipeline" \
+            ntfy.sh/this-is-a-test-3456
+
 
   lint_test_and_build:
     runs-on: ubuntu-latest
@@ -124,9 +127,14 @@ jobs:
       - name: Notify pipeline success
         if: success()
         run: |
-          echo "Successful pipeline execution!"
+          curl \
+            -H "Title: Successful CI/CD Pipeline!" \
+            ntfy.sh/this-is-a-test-3456
+
 
       - name: Notify pipeline error
         if: failure()
         run: |
-          echo "Failure!"
+          curl \
+            -H "Title: Failed CI/CD Pipeline run!" \
+            ntfy.sh/this-is-a-test-3456
