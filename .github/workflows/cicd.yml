@@ -124,9 +124,9 @@ jobs:
       - name: Notify pipeline success
         if: success()
         run: |
-          bash cicd-scripts/ntfy-start.sh ${{ github.head_ref }} ${{ github.triggering_actor }} ${{ github.repository }}
+          bash cicd-scripts/ntfy-success.sh ${{ github.head_ref }} ${{ github.triggering_actor }} ${{ github.repository }}
 
       - name: Notify pipeline error
         if: failure()
         run: |
-          bash cicd-scripts/ntfy-start.sh ${{ github.head_ref }} ${{ github.triggering_actor }} ${{ github.repository }}
+          bash cicd-scripts/ntfy-failure.sh ${{ github.head_ref }} ${{ github.triggering_actor }} ${{ github.repository }}
