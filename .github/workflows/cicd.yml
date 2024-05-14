@@ -5,7 +5,7 @@ name: Integration checks
 
 on:
   push:
-    tags: "*"
+    branches: [ "release-v*.*.*" ]
 
   pull_request:
     branches: [ "master" ]
@@ -85,7 +85,7 @@ jobs:
         poetry run pytest tests/test_solve_random_sample
 
     - name: Create Release
-      if: startsWith(github.ref, 'refs/tags/')
+      if: startsWith(github.ref, 'refs/heads/release')
       run: |
         gh release create ${{ github.ref_name }} dist/*.tar.gz --notes ""
 
