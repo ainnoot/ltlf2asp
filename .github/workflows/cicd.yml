@@ -57,9 +57,6 @@ jobs:
     - name: Install Development dependencies
       run: poetry install --only=dev
 
-    - name: Black linting
-      run: poetry run black --check ltlf2asp
-
     - name: Ruff linting
       run: poetry run ruff check ltlf2asp
 
@@ -73,7 +70,7 @@ jobs:
       run: poetry run pytest tests/test_parser
 
     - name: Install BLACK
-      run: | 
+      run: |
         sudo apt install -y ./black-install-folder/black-sat-0.10.6.ubuntu20.04.x86_64.deb
 
     - name: Change executable name for BLACK
@@ -86,7 +83,7 @@ jobs:
     - name: Build package
       run: poetry build
 
-    - name: Upload artifact 
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: python-package-distributions

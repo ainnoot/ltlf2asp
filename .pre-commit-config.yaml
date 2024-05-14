@@ -1,0 +1,52 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+default_stages: []
+
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+
+fail_fast: true
+
+repos:
+- repo: local
+  hooks:
+      - id: commit-msg
+        name: validate commit-msg
+        language: python
+        language_version: "3.12"
+        entry: python3 .hooks/commit-msg
+        stages: [ commit-msg ]
+
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    -   id: trailing-whitespace
+        stages: [ pre-commit ]
+
+    -   id: end-of-file-fixer
+        stages: [ pre-commit ]
+
+    -   id: check-yaml
+        stages: [ pre-commit ]
+
+    -   id: check-added-large-files
+        stages: [ pre-commit ]
+
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.4
+    hooks:
+    -   id: ruff-format
+        name: Auto-format code with ruff
+        stages: [ pre-commit ]
+
+    -   id: ruff
+        name: Lint checks with ruff
+        stages: [ pre-commit ]
+
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+    -   id: mypy
+        args: [--ignore-missing-imports]
+        stages: [ pre-commit ]
