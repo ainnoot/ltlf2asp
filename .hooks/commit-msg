@@ -29,20 +29,20 @@ def validate_commit_message(message):
 
     match = re.match(pattern, message)
     if not match:
-        print("WRONG_FORMAT")
+        print("WRONG_FORMAT", file=sys.stderr)
         sys.exit(1)
 
     type_, scope_, is_danger, msg = match.groups()
     if type_ not in KNOWN_TYPES:
-        print("UNKNOWN_TYPE")
+        print("UNKNOWN_TYPE", file=sys.stderr)
         sys.exit(1)
 
     if is_danger is not None and scope_ is None:
-        print("NO_SCOPE_ON_BREAKING_CHANGE")
+        print("NO_SCOPE_ON_BREAKING_CHANGE", file=sys.stderr)
         sys.exit(1)
 
     if is_danger is not None and len(msg) < 15:
-        print("SHORT_MESSAGE_ON_BREAKING_CHANGE")
+        print("SHORT_MESSAGE_ON_BREAKING_CHANGE", file=sys.stderr)
         sys.exit(1)
 
 
