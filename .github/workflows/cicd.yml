@@ -21,12 +21,6 @@ jobs:
       env: { CONTENT: "${{ toJson(github) }}" }
       run: "echo $CONTENT | jq"
 
-  notify-pipeline-start:
-    runs-on: ubuntu-latest
-    steps:
-
-
-
   lint_test_and_build:
     runs-on: ubuntu-latest
 
