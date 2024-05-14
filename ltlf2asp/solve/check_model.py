@@ -1,16 +1,15 @@
 from typing import Tuple, Iterable
 
-import clingo  # type: ignore
-
+import clingo
 from ltlf2asp.solve.decode_model import State
 from ltlf2asp.solve import CHECK
 
 
-def trace_2(t: int, value: str, positive):
+def trace_2(t: int, value: str, positive: bool) -> clingo.Symbol:
     return clingo.Function("trace", [clingo.Number(t), clingo.String(value)], positive)
 
 
-def time_1(t: int):
+def time_1(t: int) -> clingo.Symbol:
     return clingo.Function("time", [clingo.Number(t)])
 
 

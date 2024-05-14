@@ -1,1 +1,1 @@
-from .parser import parse_formula  # noqa
+from .parser import parse_formula as parse_formula

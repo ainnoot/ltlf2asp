@@ -1,5 +1,5 @@
 from typing import Optional, Tuple, List, Iterable
-import clingo  # type: ignore
+import clingo
 from ltlf2asp.solve.decode_model import State, SolveResult, SolveStatus, Model
 from ltlf2asp.solve import SOLVE_INCREMENTAL
 

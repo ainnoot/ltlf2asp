@@ -3,8 +3,8 @@ class ParsingError(Exception):
 
 
 class UnsupportedOperator(Exception):
-    def __init__(self, string):
-        self.string = string
+    def __init__(self, string: str) -> None:
+        self.string: str = string
 
-    def message(self):
+    def message(self) -> str:
         return self.string
