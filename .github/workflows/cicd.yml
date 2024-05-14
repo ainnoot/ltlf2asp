@@ -21,22 +21,16 @@ jobs:
       env: { CONTENT: "${{ toJson(github) }}" }
       run: "echo $CONTENT | jq"
 
-  notify-pipeline-start:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Notify pipeline start
-        run: |
-          curl \
-            -H "Title: Start CI/CD Pipeline" \
-            ntfy.sh/this-is-a-test-3456
-
-
   lint_test_and_build:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
       name: Checkout repository
+
+    - name: Notify pipeline start
+      run: |
+        bash cicd-scripts/ntfy-start.sh ${{ github.head_ref }} ${{ github.triggering_actor }} ${{ github.repository }}
 
     - name: Install Poetry
       run: pipx install poetry
@@ -124,17 +118,15 @@ jobs:
     needs: [release]
     if: always()
     steps:
+      - uses: actions/checkout@v4
+        name: Checkout repository
+
       - name: Notify pipeline success
         if: success()
         run: |
-          curl \
-            -H "Title: Successful CI/CD Pipeline!" \
-            ntfy.sh/this-is-a-test-3456
-
+          bash cicd-scripts/ntfy-start.sh ${{ github.head_ref }} ${{ github.triggering_actor }} ${{ github.repository }}
 
       - name: Notify pipeline error
         if: failure()
         run: |
-          curl \
-            -H "Title: Failed CI/CD Pipeline run!" \
-            ntfy.sh/this-is-a-test-3456
+          bash cicd-scripts/ntfy-start.sh ${{ github.head_ref }} ${{ github.triggering_actor }} ${{ github.repository }}
