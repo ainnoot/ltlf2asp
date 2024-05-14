@@ -61,7 +61,9 @@ jobs:
       run: poetry run ruff check ltlf2asp
 
     - name: Typecheck
-      run: poetry run mypy ltlf2asp --strict
+      run: |
+        poetry run mypy --install-types
+        poetry run mypy ltlf2asp --strict
 
     - name: Install dependencies
       run: poetry install
