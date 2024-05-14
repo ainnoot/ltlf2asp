@@ -8,8 +8,6 @@ default_install_hook_types:
 
 fail_fast: true
 
-
-
 repos:
 - repo: local
   hooks:
@@ -18,16 +16,22 @@ repos:
         language: python
         language_version: "3.12"
         entry: python3 .hooks/commit-msg
-        stages:
-            - commit-msg
+        stages: [ commit-msg ]
 
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.2.0
     hooks:
     -   id: trailing-whitespace
+        stages: [ pre-commit ]
+
     -   id: end-of-file-fixer
+        stages: [ pre-commit ]
+
     -   id: check-yaml
+        stages: [ pre-commit ]
+
     -   id: check-added-large-files
+        stages: [ pre-commit ]
 
 -   repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.4.4
@@ -38,9 +42,11 @@ repos:
 
     -   id: ruff
         name: Lint checks with ruff
+        stages: [ pre-commit ]
 
 -   repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.10.0
     hooks:
     -   id: mypy
         args: [--ignore-missing-imports]
+        stages: [ pre-commit ]
