@@ -1,6 +1,6 @@
 from typing import Tuple, Iterable
 
-import clingo
+import clingo  # type: ignore
 from ltlf2asp.solve.decode_model import State
 from ltlf2asp.solve import CHECK
 

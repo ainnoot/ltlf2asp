@@ -3,7 +3,7 @@ from typing import Iterable
 from ltlf2asp.solve.decode_model import SolveResult
 from ltlf2asp.solve.incremental_solve_loop import solve as solve_incremental
 from ltlf2asp.solve.static_solve_loop import solve as solve_static
-import clingo
+import clingo  # type: ignore
 
 
 class Solver:

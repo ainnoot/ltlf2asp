@@ -1,7 +1,7 @@
 from typing import TypeVar, Set, Type, Sequence
 
-import clingo
-import lark
+import clingo  # type: ignore
+import lark  # type: ignore
 from lark import Lark, Transformer
 from pathlib import Path
 from ltlf2asp.parser.constants import Constants

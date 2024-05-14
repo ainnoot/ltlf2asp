@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import Set, Dict, Sequence
 
-import clingo
+import clingo  # type: ignore
 from ltlf2asp.parser.constants import Constants
 from ltlf2asp.parser.reify_interface import Reify
 
