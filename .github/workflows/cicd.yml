@@ -78,7 +78,9 @@ jobs:
         sudo mv $(which black) /usr/bin/black-sat
 
     - name: Run solve randomized tests
-      run: poetry run pytest tests/test_solve_random_sample
+      run: |
+        poetry run pytest tests/test_solve_random_sample
+        poetry run pytest tests/test_always_fails.py
 
     - name: Build package
       run: poetry build
