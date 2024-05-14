@@ -100,4 +100,4 @@ jobs:
     - name: Notify successful pipeline run
       if: always() && failure()
       run: |
-        bash cicd-scripts/ntfy-success.sh ${{ github.head_ref }} ${{ github.triggering_actor }} ${{ github.repository }}
+        bash cicd-scripts/ntfy-failure.sh ${{ github.head_ref }} ${{ github.triggering_actor }} ${{ github.repository }}
