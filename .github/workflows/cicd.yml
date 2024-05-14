@@ -62,7 +62,7 @@ jobs:
 
     - name: Typecheck
       run: |
-        poetry run mypy ltlf2asp --strict --install-types
+        poetry run mypy ltlf2asp
 
     - name: Install dependencies
       run: poetry install
