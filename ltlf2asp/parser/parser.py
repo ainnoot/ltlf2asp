@@ -166,7 +166,6 @@ class LTLfFlatTransformer(Transformer[T]):
         return string.replace("'", '"')
 
     def ltlf_atom(self, args: Sequence[str]) -> T:
-        print("Got:", args, type(args[0]))
         if args[0].lower() == Constants.TRUE:
             return self.ltlf_true(args)
 
