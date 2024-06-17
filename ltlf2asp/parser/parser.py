@@ -27,6 +27,9 @@ class LTLfFlatTransformer(Transformer[T]):
     def ltlf_formula(self, args: Sequence[T]) -> T:
         return args[0]
 
+    def ltlf_unaryop(self, args: Sequence[T]) -> T:
+        return args[0]
+
     def ltlf_equivalence(self, args: Sequence[T]) -> T:
         if len(args) == 1:
             return args[0]

@@ -60,9 +60,17 @@ class State:
     @staticmethod
     def from_clingo_model(model: clingo.Model) -> Tuple["State", ...]:
         trace_dict: Dict[int, Dict[str, bool]] = defaultdict(dict)
+        last_instant = None
+        for x in model.context.symbolic_atoms.by_signature("last_state", 1):
+            if model.contains(x.symbol):
+                last_instant = x.symbol.arguments[0].number
+
         for x in model.context.symbolic_atoms.by_signature("trace", 2):
             symbol = x.symbol
             t = symbol.arguments[0].number
+            if t > last_instant:
+                continue
+
             a = symbol.arguments[1].string
             trace_dict[t][a] = model.contains(symbol)
 

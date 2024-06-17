@@ -31,8 +31,8 @@ time(a..T) :- last_state(T), search(a, b).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Atomic Formula %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 holds(t,X) :- atomic(X,A), trace(t,A).
 holds(t,X) :- last(X), last_state(t), time(t).
-holds(t,X) :- next(X,F), holds(t+1,F).
-holds(t,X) :- true(X).
+holds(t,X) :- next(X,F), holds(t+1,F), time(t+1).
+holds(t,X) :- true(X), time(t).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Temporal Formula %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 holds(t,X) :- until(X,LHS,RHS), holds(t,RHS).

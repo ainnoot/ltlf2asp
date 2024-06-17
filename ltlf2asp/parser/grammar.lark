@@ -35,7 +35,7 @@ RELEASE.2: /R(?=[^a-zA-Z]|$)/
 ALWAYS.2: /G(?=[^a-zA-Z]|$)/
 EVENTUALLY.2: /F(?=[^a-zA-Z]|$)/
 NEXT.2: /X(?=[^a-zA-Z]|$)/
-WEAK_NEXT.2: /WX(?=[^a-zA-Z]|$)/
+WEAK_NEXT.2: /WX(?=[^a-zA-Z]|$)/ | /wX(?=[^a-zA-Z]|$)/
 WEAK_UNTIL.2: /W(?=[^a-zA-Z]|$)/
 STRONG_RELEASE.2: /M(?=[^a-zA-Z]|$)/
 NOT: "!" | "~"
