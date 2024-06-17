@@ -27,6 +27,9 @@ class LTLfFlatTransformer(Transformer[T]):
     def ltlf_formula(self, args: Sequence[T]) -> T:
         return args[0]
 
+    def ltlf_unaryop(self, args: Sequence[T]) -> T:
+        return args[0]
+
     def ltlf_equivalence(self, args: Sequence[T]) -> T:
         if len(args) == 1:
             return args[0]
@@ -166,7 +169,6 @@ class LTLfFlatTransformer(Transformer[T]):
         return string.replace("'", '"')
 
     def ltlf_atom(self, args: Sequence[str]) -> T:
-        print("Got:", args, type(args[0]))
         if args[0].lower() == Constants.TRUE:
             return self.ltlf_true(args)
 
