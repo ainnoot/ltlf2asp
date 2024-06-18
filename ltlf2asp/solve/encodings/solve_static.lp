@@ -1,14 +1,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Search %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #const b=0.
 #const a=0.
-{ last_instant(T): T=a..b-1 } = 1.
-time(0..T) :- last_instant(T).
+{ last_state(T): T=a..b-1 } = 1.
+time(0..T) :- last_state(T).
 { trace(T,X): atomic(_,X) } :- time(T).
 :- root(X), not holds(0, X).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Atomic Formula %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 holds(T, X) :- atomic(X, A), time(T), trace(T, A).
-holds(T, X) :- last(X), last_instant(T).
+holds(T, X) :- last(X), last_state(T).
 holds(T, X) :- true(X), time(T).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% Propositional Formula %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -22,7 +22,7 @@ holds(T, X) :- until(X, LHS, RHS), holds(T, RHS).
 holds(T, X) :- until(X, LHS, RHS), holds(T, LHS), holds(T+1, X).
 holds(T, X) :- release(X, LHS, RHS), holds(T,RHS), holds(T,LHS).
 holds(T, X) :- release(X, LHS, RHS), holds(T,RHS), holds(T+1, X).
-holds(T, X) :- release(X, LHS, RHS), holds(T,RHS), last_instant(T).
+holds(T, X) :- release(X, LHS, RHS), holds(T,RHS), last_state(T).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Output projection %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #show.
