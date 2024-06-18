@@ -89,6 +89,8 @@ def run() -> int:
         print("* ltlf2asp check [trace: Path] [formula: Path]")
         sys.exit(1)
 
+    # TODO: Make a parameter, or fix the grammar...
+    sys.setrecursionlimit(2056)
     command, args = argv[0], argv[1:]
     match command:
         case "check":
