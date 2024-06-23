@@ -1,8 +1,8 @@
 from typing import Optional, Sequence
 
 from ltlf2asp.parser.reify_interface import Reify
-from tests.test_parser import syntax
-from tests.test_parser.syntax import Formula
+from ltlf2asp.parser import syntax
+from ltlf2asp.parser.syntax import Formula, FormulaBuilder
 
 
 class ReifyFormulaAsObject(Reify[syntax.Formula, Optional[syntax.Formula]]):
@@ -11,54 +11,54 @@ class ReifyFormulaAsObject(Reify[syntax.Formula, Optional[syntax.Formula]]):
         self.f: Optional[syntax.Formula] = None
 
     def result(self) -> Optional[syntax.Formula]:
-        return self.f
+        return self.f.to_nnf()
 
     def true(self) -> syntax.Formula:
-        return syntax.Truth()
+        return FormulaBuilder.true()
 
     def false(self) -> syntax.Formula:
-        return syntax.Faux()
+        return FormulaBuilder.false()
 
     def last(self) -> syntax.Formula:
-        return syntax.Last()
+        return FormulaBuilder.last()
 
     def proposition(self, string: str) -> syntax.Formula:
-        return syntax.Proposition(string)
+        return FormulaBuilder.proposition(string)
 
     def next(self, f: syntax.Formula) -> syntax.Formula:
-        return syntax.Next(f)
+        return FormulaBuilder.next(f)
 
     def weak_next(self, f: syntax.Formula) -> syntax.Formula:
-        return syntax.WeakNext(f)
+        return FormulaBuilder.weak_next(f)
 
     def until(self, lhs: syntax.Formula, rhs: syntax.Formula) -> syntax.Formula:
-        return syntax.Until(lhs, rhs)
+        return FormulaBuilder.until(lhs, rhs)
 
     def release(self, lhs: syntax.Formula, rhs: syntax.Formula) -> syntax.Formula:
-        return syntax.Release(lhs, rhs)
+        return FormulaBuilder.release(lhs, rhs)
 
     def weak_until(self, lhs: syntax.Formula, rhs: syntax.Formula) -> syntax.Formula:
-        return syntax.WeakUntil(lhs, rhs)
+        return FormulaBuilder.weak_until(lhs, rhs)
 
     def strong_release(
         self, lhs: syntax.Formula, rhs: syntax.Formula
     ) -> syntax.Formula:
-        return syntax.StrongRelease(lhs, rhs)
+        return FormulaBuilder.strong_release(lhs, rhs)
 
     def equivalence(self, lhs: syntax.Formula, rhs: syntax.Formula) -> syntax.Formula:
-        return syntax.Equivalence(lhs, rhs)
+        return FormulaBuilder.equivalence(lhs, rhs)
 
     def implies(self, lhs: syntax.Formula, rhs: syntax.Formula) -> syntax.Formula:
-        return syntax.Implication(lhs, rhs)
+        return FormulaBuilder.implication(lhs, rhs)
 
     def eventually(self, f: syntax.Formula) -> syntax.Formula:
-        return syntax.Eventually(f)
+        return FormulaBuilder.eventually(f)
 
     def always(self, f: syntax.Formula) -> syntax.Formula:
-        return syntax.Always(f)
+        return FormulaBuilder.always(f)
 
     def negate(self, f: syntax.Formula) -> syntax.Formula:
-        return syntax.Negate(f)
+        return FormulaBuilder.negate(f)
 
     def conjunction(self, fs: Sequence[Formula]) -> syntax.Formula:
         return syntax.Conjunction(fs)

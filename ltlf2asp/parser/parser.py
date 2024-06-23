@@ -6,6 +6,7 @@ from lark import Lark, Transformer
 from pathlib import Path
 from ltlf2asp.parser.constants import Constants
 from ltlf2asp.parser.reify_as_atoms import ReifyFormulaAsFacts
+from ltlf2asp.parser.reify_as_object import ReifyFormulaAsObject
 from ltlf2asp.exceptions import ParsingError, UnsupportedOperator
 from ltlf2asp.parser.reify_interface import Reify
 
@@ -201,3 +202,7 @@ def _parse_formula(formula_string: str, start_rule: str, reify: Type[Reify[T, G]
 
 def parse_formula(formula_string: str) -> Set[clingo.Symbol]:
     return _parse_formula(formula_string, "start", ReifyFormulaAsFacts)
+
+
+def parse_formula_object(formula_string: str):
+    return _parse_formula(formula_string, "start", ReifyFormulaAsObject)

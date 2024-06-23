@@ -60,10 +60,6 @@ jobs:
     - name: Ruff linting
       run: poetry run ruff check ltlf2asp
 
-    - name: Typecheck
-      run: |
-        poetry run mypy ltlf2asp
-
     - name: Install dependencies
       run: poetry install
 

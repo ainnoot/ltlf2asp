@@ -1,6 +1,6 @@
-from tests.test_parser.reify_as_object import ReifyFormulaAsObject
+from tests.test_parser.reify_as_object_lib import ReifyFormulaAsObject
 from ltlf2asp.parser.parser import _parse_formula
-from tests.test_parser.syntax import (
+from tests.test_parser.syntax_test_lib import (
     Proposition,
     WeakNext,
     Faux,
