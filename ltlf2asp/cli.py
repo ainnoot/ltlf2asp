@@ -4,10 +4,11 @@ from pathlib import Path
 from typing import Sequence
 
 from ltlf2asp.solve.solver_interface import Solver
-from ltlf2asp.parser import parse_formula
+from ltlf2asp.parser import parse_formula, parse_formula_object, tableaux_reify
 from dataclasses import dataclass
 from ltlf2asp.solve.check_model import check_trace
 from ltlf2asp.solve.parse_trace import parse_trace
+from ltlf2asp.solve.tableaux import Reynolds
 
 
 @dataclass(frozen=True)
@@ -22,6 +23,20 @@ class SolveArguments:
             raise RuntimeError("Formula does not exist.")
 
         if self.search_horizon <= 0:
+            raise RuntimeError("Search horizon must be a positive integer.")
+
+
+@dataclass(frozen=True)
+class TableauxArguments:
+    formula: Path
+    depth: int
+    verbose: bool
+
+    def __post_init__(self) -> None:
+        if not self.formula.is_file():
+            raise RuntimeError("Formula does not exist.")
+
+        if self.depth <= 0:
             raise RuntimeError("Search horizon must be a positive integer.")
 
 
@@ -47,6 +62,16 @@ def parse_check_args(argv: Sequence[str]) -> CheckArguments:
     return CheckArguments(**args.__dict__)
 
 
+def parse_tableaux_args(argv: Sequence[str]) -> TableauxArguments:
+    p = ArgumentParser()
+    p.add_argument("formula", type=Path)
+    p.add_argument("depth", type=int)
+    p.add_argument("--verbose", "-v", action="store_true")
+
+    args = p.parse_args(argv)
+    return TableauxArguments(**args.__dict__)
+
+
 def parse_solve_args(argv: Sequence[str]) -> SolveArguments:
     p = ArgumentParser()
     p.add_argument("formula", type=Path)
@@ -57,6 +82,16 @@ def parse_solve_args(argv: Sequence[str]) -> SolveArguments:
     args = p.parse_args(argv)
 
     return SolveArguments(**args.__dict__)
+
+
+def tableaux(args: TableauxArguments):
+    formula = parse_formula_object(args.formula.read_text())
+    tableaux = Reynolds(args.depth, args.verbose)
+    facts = tableaux_reify(formula.to_nnf())
+    result = tableaux.solve(facts)
+
+    print(result.json())
+    return 0
 
 
 def solve(args: SolveArguments) -> int:
@@ -87,6 +122,7 @@ def run() -> int:
         print("Usage:")
         print("* ltlf2asp solve [-i --incremental] [formula: Path] [horizon: int]")
         print("* ltlf2asp check [trace: Path] [formula: Path]")
+        print("* ltlf2asp reynolds [formula: Path] [depth: int]")
         sys.exit(1)
 
     # TODO: Make a parameter, or fix the grammar...
@@ -97,5 +133,7 @@ def run() -> int:
             return check(parse_check_args(args))
         case "solve":
             return solve(parse_solve_args(args))
+        case "reynolds":
+            return tableaux(parse_tableaux_args(args))
 
     raise RuntimeError("Unknown command!")
