@@ -1,8 +1,8 @@
 from typing import Optional, Sequence
 
 from ltlf2asp.parser.reify_interface import Reify
-from tests.test_parser import test_syntax as syntax
-from tests.test_parser.test_syntax import Formula
+from tests.test_parser import syntax_test_lib as syntax
+from tests.test_parser.syntax_test_lib import Formula
 
 
 class ReifyFormulaAsObject(Reify[syntax.Formula, Optional[syntax.Formula]]):
