@@ -44,4 +44,4 @@ def solve(f: Iterable[clingo.Symbol], max_horizon: int) -> SolveResult:
 
         a, b = b, b * 2
 
-    return SolveResult(SolveStatus.UNSATISFIABLE, a, None)
+    return SolveResult(SolveStatus.UNKNOWN, a, None)

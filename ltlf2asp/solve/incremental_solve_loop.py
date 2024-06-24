@@ -50,4 +50,4 @@ def solve(f: Iterable[clingo.Symbol], max_horizon: int) -> SolveResult:
         ctl.assign_external(search, False)
         a, b = b, 2 * b
 
-    return SolveResult(SolveStatus.UNSATISFIABLE, a, None)
+    return SolveResult(SolveStatus.UNKNOWN, a, None)

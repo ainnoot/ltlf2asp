@@ -4,8 +4,8 @@ from ltlf2asp.solve.tableaux import Reynolds
 
 def check_on_tableaux(formula_string, horizon):
     obj = parse_formula_object(formula_string).to_nnf()
-    tab = Reynolds(horizon, False)
-    ans = tab.solve(tableaux_reify(obj))
+    tab = Reynolds(False)
+    ans = tab.solve(tableaux_reify(obj), horizon)
     return ans
 
 

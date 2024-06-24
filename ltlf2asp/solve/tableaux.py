@@ -1,33 +1,27 @@
 from dataclasses import dataclass
 from typing import Iterable
-from enum import StrEnum
 import clingo
 from ltlf2asp.solve import REYNOLDS
 import json
-
-
-class TableauxStatus(StrEnum):
-    UNKNOWN = "UNKNOWN"
-    UNSATISFIABLE = "UNSATISFIABLE"
-    SATISFIABLE = "SATISFIABLE"
+from ltlf2asp.solve.decode_model import SolveStatus
 
 
 @dataclass(frozen=True)
 class TableauxResult:
     k: int
-    status: TableauxStatus
+    status: SolveStatus
 
     @property
     def satisfiable(self):
-        return self.status == TableauxStatus.SATISFIABLE
+        return self.status == SolveStatus.SATISFIABLE
 
     @property
     def unsatisfiable(self):
-        return self.status == TableauxStatus.UNSATISFIABLE
+        return self.status == SolveStatus.UNSATISFIABLE
 
     @property
     def unknown(self):
-        return self.status == TableauxStatus.UNKNOWN
+        return self.status == SolveStatus.UNKNOWN
 
     def json(self):
         return json.dumps({"max_depth": self.k, "result": self.status.value}, indent=2)
@@ -35,7 +29,7 @@ class TableauxResult:
 
 class Catch:
     def __init__(self, verbose) -> None:
-        self.status_ = TableauxStatus.UNKNOWN
+        self.status_ = SolveStatus.UNKNOWN
         self.verbose = verbose
 
     def __call__(self, model: clingo.Model) -> bool:
@@ -49,10 +43,10 @@ class Catch:
 
         if model.optimality_proven:
             if model.cost == [0]:
-                self.status_ = TableauxStatus.SATISFIABLE
+                self.status_ = SolveStatus.SATISFIABLE
 
             else:
-                self.status_ = TableauxStatus.UNSATISFIABLE
+                self.status_ = SolveStatus.UNSATISFIABLE
 
             return False
 
@@ -64,13 +58,12 @@ class Catch:
 
 
 class Reynolds:
-    def __init__(self, depth: int, verbose: bool) -> None:
-        self.depth = depth
+    def __init__(self, verbose: bool) -> None:
         self.verbose = verbose
 
-    def solve(self, f: Iterable[clingo.Symbol]) -> TableauxResult:
+    def solve(self, f: Iterable[clingo.Symbol], depth: int) -> TableauxResult:
         ctl = clingo.Control(
-            ["-c depth={}".format(self.depth), "--opt-mode=optN", "--models=0"]
+            ["-c depth={}".format(depth), "--opt-mode=optN", "--models=0"]
         )
         ctl.load(REYNOLDS)
 
@@ -82,4 +75,4 @@ class Reynolds:
         ctl.ground([("base", [])])
         _ = ctl.solve(on_model=cb)
 
-        return TableauxResult(self.depth, cb.status)
+        return TableauxResult(depth, cb.status)

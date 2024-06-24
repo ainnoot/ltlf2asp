@@ -8,6 +8,7 @@ from enum import StrEnum
 
 class SolveStatus(StrEnum):
     SATISFIABLE = "SAT"
+    UNKNOWN = "UNKNOWN"
     UNSATISFIABLE = "UNSAT"
 
 
@@ -26,7 +27,10 @@ class SolveResult:
     def json(self) -> str:
         import json
 
-        if self.status == SolveStatus.UNSATISFIABLE:
+        if (
+            self.status == SolveStatus.UNSATISFIABLE
+            or self.status == SolveStatus.UNKNOWN
+        ):
             unsat_json = {"result": self.status, "k": self.k}
 
             return json.dumps(unsat_json, indent=4)
