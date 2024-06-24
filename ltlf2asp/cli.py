@@ -67,6 +67,19 @@ class CheckArguments:
             raise RuntimeError("Trace file does not exist.")
 
 
+@dataclass(frozen=True)
+class ParseArgs:
+    formula: Path
+    method: str
+
+    def __post_init__(self) -> None:
+        if not self.formula.is_file():
+            raise RuntimeError("Formula file does not exist.")
+
+        if self.method not in ["dag", "tableaux"]:
+            raise RuntimeError("Unknown representation method: {}".format(self.method))
+
+
 def parse_check_args(argv: Sequence[str]) -> CheckArguments:
     p = ArgumentParser()
     p.add_argument("trace", type=Path)
@@ -108,6 +121,16 @@ def parse_hybrid_args(argv: Sequence[str]) -> HybridArguments:
     return HybridArguments(**args.__dict__)
 
 
+def parse_parse_args(argv: Sequence[str]) -> ParseArgs:
+    p = ArgumentParser()
+    p.add_argument("formula", type=Path)
+    p.add_argument("-m", "--method", choices=["dag", "tableaux"], default="dag")
+
+    args = p.parse_args(argv)
+
+    return ParseArgs(**args.__dict__)
+
+
 def tableaux(args: TableauxArguments):
     formula = parse_formula_object(args.formula.read_text())
     tableaux = Reynolds(args.verbose)
@@ -143,6 +166,21 @@ def hybrid(args: HybridArguments) -> int:
     return 0
 
 
+def parse(args: ParseArgs) -> int:
+    # TODO: Fix this!
+    if args.method == "tableaux":
+        formula_tableaux = parse_formula_object(args.formula.read_text()).to_nnf()
+        for fact in tableaux_reify(formula_tableaux):
+            print(str(fact) + ".")
+
+    elif args.method == "dag":
+        formula_ltl2sat = parse_formula(args.formula.read_text())
+        for fact in formula_ltl2sat:
+            print(str(fact) + ".")
+
+    return 0
+
+
 def check(args: CheckArguments) -> int:
     formula = parse_formula(args.formula.read_text())
     trace = parse_trace(args.trace.read_text())
@@ -160,6 +198,7 @@ def run() -> int:
         print("* ltlf2asp check [trace: Path] [formula: Path]")
         print("* ltlf2asp reynolds [formula: Path] [depth: int]")
         print("* ltlf2asp hybrid [formula: Path] [depth: int]")
+        print("* ltlf2asp parse [formula: Path] [-m DAG|TABLEAUX]")
         sys.exit(1)
 
     # TODO: Make a parameter, or fix the grammar...
@@ -174,5 +213,7 @@ def run() -> int:
             return tableaux(parse_tableaux_args(args))
         case "hybrid":
             return hybrid(parse_hybrid_args(args))
+        case "parse":
+            return parse(parse_parse_args(args))
 
     raise RuntimeError("Unknown command!")
