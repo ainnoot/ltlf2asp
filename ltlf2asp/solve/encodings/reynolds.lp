@@ -50,6 +50,7 @@ progress(T) :- state(T,next(F)), not expand(T), not close_branch(T).
 progress(T) :- state(T,weak_next(F)), not expand(T), not close_branch(T).
 
 % Big choice rule to model which expansion rules are available in a given state
+% useful for debugging
 %{
 %  expand_until_left(T,F): state(T,F), until(F,_,_);
 %  expand_until_right(T,F): state(T,F), until(F,_,_);
@@ -60,6 +61,7 @@ progress(T) :- state(T,weak_next(F)), not expand(T), not close_branch(T).
 %} = 1 :- expand(T), open_branch(T).
 
 % Can apply multiple rewriting rules at once
+% this reduces required depth for the tableaux
 { expand_until_left(T,F); expand_until_right(T,F) } = 1 :- state(T,F), until(F,_,_), expand(T), open_branch(T).
 { expand_release_left(T,F); expand_release_right(T,F) } = 1 :- state(T,F), release(F,_,_), expand(T), open_branch(T).
 expand_conjunction(T,F) :- state(T,F), conjunction(F,_), expand(T), open_branch(T).
