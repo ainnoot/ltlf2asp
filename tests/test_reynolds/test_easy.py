@@ -49,3 +49,41 @@ def test_trivially_false():
     formula_string = "a & ~a"
     ans = check_on_tableaux(formula_string, 20)
     assert ans.unsatisfiable
+
+
+def test_unsat_over_next():
+    formula_string = "X(~a) & X(a)"
+    ans = check_on_tableaux(formula_string, 20)
+    assert ans.unsatisfiable
+
+
+def test_unsat_over_next_and_eventually():
+    formula_string = "F(a & b) & G(a -> ~c) & G(b -> c)"
+    ans = check_on_tableaux(formula_string, 20)
+    assert ans.unsatisfiable
+
+
+def test_unsat_over_until():
+    formula_string = "~b & (a U b) & G(a -> ~c) & G(~c -> X(d)) & G(d & b)"
+    ans = check_on_tableaux(formula_string, 50)
+    assert ans.unsatisfiable
+
+
+def test_unsat_over_until_2():
+    formula_string = "~b & (a U b) & G(a -> X(a))"
+    ans = check_on_tableaux(formula_string, 50)
+    assert ans.unsatisfiable
+
+
+def test_unsat_over_disjunction():
+    formula_string = (
+        "(a | b | c) & G(a -> X(a)) & (F(b) <-> F(c)) & (b -> G(~c)) & (c -> G(~b))"
+    )
+    ans = check_on_tableaux(formula_string, 50)
+    assert ans.unsatisfiable
+
+
+def test_sat_empty_model():
+    formula_string = "G(a -> (WX a))"
+    ans = check_on_tableaux(formula_string, 50)
+    assert ans.satisfiable
