@@ -1,3 +1,4 @@
+% depth_range(0,8)
 #const depth=8.
 state_id(0..depth-1).
 
@@ -49,14 +50,20 @@ progress(T) :- state(T,next(F)), not expand(T), not close_branch(T).
 progress(T) :- state(T,weak_next(F)), not expand(T), not close_branch(T).
 
 % Big choice rule to model which expansion rules are available in a given state
-{
-  expand_until_left(T,F): state(T,F), until(F,_,_);
-  expand_until_right(T,F): state(T,F), until(F,_,_);
-  expand_conjunction(T,F): state(T,F), conjunction(F,_);
-  expand_disjunction(T,F): state(T,F), disjunction(F,_);
-  expand_release_left(T,F): state(T,F), release(F,_,_);
-  expand_release_right(T,F): state(T,F), release(F,_,_)
-} = 1 :- expand(T), open_branch(T).
+%{
+%  expand_until_left(T,F): state(T,F), until(F,_,_);
+%  expand_until_right(T,F): state(T,F), until(F,_,_);
+%  expand_conjunction(T,F): state(T,F), conjunction(F,_);
+%  expand_disjunction(T,F): state(T,F), disjunction(F,_);
+%  expand_release_left(T,F): state(T,F), release(F,_,_);
+%  expand_release_right(T,F): state(T,F), release(F,_,_)
+%} = 1 :- expand(T), open_branch(T).
+
+% Can apply multiple rewriting rules at once
+{ expand_until_left(T,F); expand_until_right(T,F) } = 1 :- state(T,F), until(F,_,_), expand(T), open_branch(T).
+{ expand_release_left(T,F); expand_release_right(T,F) } = 1 :- state(T,F), release(F,_,_), expand(T), open_branch(T).
+expand_conjunction(T,F) :- state(T,F), conjunction(F,_), expand(T), open_branch(T).
+expand_disjunction(T,F) :- state(T,F), disjunction(F,_), expand(T), open_branch(T).
 
 % Project over subformulae affected by expansion rules (we need it for inertia (*))
 affected(T,G) :- expand_until_left(T,G).
