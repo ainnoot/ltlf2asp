@@ -145,6 +145,7 @@ result(unsat) :- close_branch(T), loop(T).
 % Answer sets of the program are closed branches, either accepting or unaccepting
 % If an accepting branch exists, it will have optimal cost.
 :~ result(unsat). [1@1]
+:~ result(sat).   [0@1]
 
 % Given P \cup [\phi], if it is:
 % unsatisfiable --> depth is not big enough to find a model/prove unsatisfiability
