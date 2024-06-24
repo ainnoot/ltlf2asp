@@ -44,12 +44,9 @@ class Catch:
         if model.optimality_proven:
             if model.cost == [0]:
                 self.status_ = SolveStatus.SATISFIABLE
-
             else:
                 self.status_ = SolveStatus.UNSATISFIABLE
-
             return False
-
         return True
 
     @property
