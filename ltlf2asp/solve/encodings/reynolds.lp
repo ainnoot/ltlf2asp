@@ -81,10 +81,10 @@ state(T+1,F) :- pre_state(T+1,F), not clumsy_node(F,_).
 state(T+1,F) :- pre_state(T+1,G), clumsy_node(G,F).
 
 result(sat) :-   close_branch(T), empty(T).
-
 result(unsat) :- close_branch(T), conflict(T).
 result(unsat) :- close_branch(T), loop(T).
 
+:- reached_depth(T), not reached_depth(T+1), open_branch(T).
 :~ result(unsat). [1@1]
 :~ result(sat).   [0@1]
 

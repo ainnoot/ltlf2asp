@@ -23,7 +23,8 @@ class LTLfFlatTransformer(Transformer[T]):
 
     def start(self, args: Sequence[T]) -> G:  # type: ignore
         self.reify.mark_as_root(args[0])
-        return self.reify.result()
+        return_value = self.reify.result()
+        return return_value
 
     def ltlf_formula(self, args: Sequence[T]) -> T:
         return args[0]

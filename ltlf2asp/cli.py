@@ -169,7 +169,7 @@ def hybrid(args: HybridArguments) -> int:
 def parse(args: ParseArgs) -> int:
     # TODO: Fix this!
     if args.method == "tableaux":
-        formula_tableaux = parse_formula_object(args.formula.read_text()).to_nnf()
+        formula_tableaux = parse_formula_object(args.formula.read_text())
         for fact in tableaux_reify(formula_tableaux):
             print(str(fact) + ".")
 

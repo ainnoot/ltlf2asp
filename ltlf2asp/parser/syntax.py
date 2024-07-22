@@ -90,7 +90,7 @@ class Truth(Atomic):
         return clingo.Function("true")
 
     def symbol(self) -> str:
-        return "#true"
+        return "True"
 
     def negate(self):
         return Faux()
@@ -109,7 +109,7 @@ class Faux(Atomic):
         return clingo.Function("false")
 
     def symbol(self) -> str:
-        return "#false"
+        return "False"
 
     def negate(self):
         return Truth()
@@ -194,7 +194,7 @@ class WeakNext(Unary):
         return ("weak-next", *self.f.__code__())
 
     def symbol(self) -> str:
-        return "WX"
+        return "wX"
 
     def negate(self):
         return Next(self.f.negate())
@@ -219,7 +219,8 @@ class Negate(Unary):
 
     def to_nnf(self):
         if isinstance(self.f, Negate):
-            return self.f.to_nnf()
+            return_value = self.f.f.to_nnf()
+            return return_value
 
         return self.f.negate().to_nnf()
 
