@@ -34,7 +34,9 @@ class Catch:
 
     def __call__(self, model: clingo.Model) -> bool:
         if self.verbose:
-            print(" Branch #{} ".format(model.number).center(80, "%"))
+            print(
+                " Branch #{} - Cost {}".format(model.number, model.cost).center(80, "%")
+            )
             sorted_symbols = sorted(
                 model.symbols(shown=True), key=lambda x: x.arguments[0].number
             )
@@ -42,10 +44,16 @@ class Catch:
             print("".center(80, "%"))
 
         if model.optimality_proven:
-            if model.cost == [0]:
-                self.status_ = SolveStatus.SATISFIABLE
-            else:
+            has_open_branch = model.cost[0] > 0
+            if has_open_branch:
+                self.status_ = SolveStatus.UNKNOWN
+
+            elif model.cost[1] > 0:
                 self.status_ = SolveStatus.UNSATISFIABLE
+
+            else:
+                self.status_ = SolveStatus.SATISFIABLE
+
             return False
         return True
 
