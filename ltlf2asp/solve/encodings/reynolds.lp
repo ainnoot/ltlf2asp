@@ -84,9 +84,13 @@ result(sat) :-   close_branch(T), empty(T).
 result(unsat) :- close_branch(T), conflict(T).
 result(unsat) :- close_branch(T), loop(T).
 
-:~ open_branch(T), not result(sat). [30@3]
-:~ result(unsat), close_branch(T). [20@2]
-:~ result(sat). [10@1]
+:~. [0@3]
+:~. [0@2]
+:~. [0@1]
+
+:~ open_branch(T), not result(sat), not reached_depth(T+1). [30@3]
+:~ result(unsat), close_branch(T), not reached_depth(T+1). [20@2]
+:~ result(sat), reached_depth(T), not reached_depth(T+1). [10@1]
 %:- reached_depth(T), not reached_depth(T+1), open_branch(T).
 %:~ result(unsat). [1@1]
 %:~ result(sat).   [0@1]
